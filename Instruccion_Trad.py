@@ -55,11 +55,11 @@ class newDecFuncion:
         self.gramm+='\n<tr><td>ID::= '+str(no)+'  </td><td> ID='+str(no)+';  </td></tr>'
         self.gramm+='\n<tr><td>TIPO::= '+str(t.tipo.name)+'  </td><td> TIPO='+str(t.tipo.name)+';  </td></tr>'
         for i in p:
-            self.vNodo.hijos[2].append(i.vNodo)
+            self.vNodo.hijos[2].hijos.append(i.vNodo)
             self.gramm+=i.gramm
         self.vNodo.hijos.append(nodoAST('{ INSTRUCCIONES }',n+4))
         for i in Linst:
-            self.vNodo.hijos[3].append(i.vNodo)
+            self.vNodo.hijos[3].hijos.append(i.vNodo)
     
     def ejecutar(self,entorno,estat):
         return
@@ -85,7 +85,7 @@ class newDecla:
             self.gramm+='\n<tr><td>INDICES::= INDICES1 [ EXP ] : </td><td> INDICES=INDICES1; INDICES.append(EXP);  </td></tr>'
             self.gramm+='\n<tr><td>INDICES::= [EXP] : </td><td> INDICES=[]; INDICES.append(EXP);  </td></tr>'    
             for i in dim:
-                self.vNodo.hijos[1].append(i.vNodo)
+                self.vNodo.hijos[1].hijos.append(i.vNodo)
     
     def ejecutar(self,entorno,estat):
         return
@@ -172,11 +172,15 @@ class newLlamadaInstr:
         self.vNodo=nodoAST('Llamada',n)
         self.vNodo.hijos.append(nodoAST(str(id),n+1))
         self.vNodo.hijos.append(nodoAST('parametros',n+2))
+        self.gramm='<tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr>'
         for i in p:
-            self.vNodo.hijos[1].append(i.vNodo)
+            self.vNodo.hijos[1].hijos.append(i.vNodo)
         
+    def getvalor(self,entorno,estat):
+        return self
+
     def ejecutar(self,entorno,estat):
-        return
+        return self.getvalor(entorno,estat)
 
 
 
@@ -209,7 +213,7 @@ class newSubIF:
         self.vNodo.hijos.append(nodoAST('INSTRUCCIONES',n+1))
         self.gramm='<tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr>'
         for i in instr:
-            self.vNodo.hijos[1].append(i.vNodo)
+            self.vNodo.hijos[1].hijos.append(i.vNodo)
             self.gramm+=i.gramm
 # etiquetas de salida, etiqueta de break y continue
     def ejecutar(self,entorno,estat):
@@ -227,7 +231,7 @@ class newWhile:
         self.vNodo.hijos.append(nodoAST('{ INSTRUCCIONES }',n+1))
         self.gramm='<tr><td>INSTRUCCION::= WHILE (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newWhile(EXP, INSTRUCCIONES); </td></tr>'
         for i in instr:
-            self.vNodo.hijos[1].append(i.vNodo)
+            self.vNodo.hijos[1].hijos.append(i.vNodo)
             self.gramm+=i.gramm
 
     def ejecutar(self,entorno,estat):
@@ -244,7 +248,7 @@ class newDo:
         self.vNodo.hijos.append(cond.vNodo)  
         self.gramm='<tr><td>INSTRUCCION::= DO { INSTRUCCIONES } WHILE (EXP);   </td><td> INSTRUCCION=newDo(EXP, INSTRUCCIONES); </td></tr>'
         for i in instr:
-            self.vNodo.hijos[0].append(i.vNodo)
+            self.vNodo.hijos[0].hijos.append(i.vNodo)
             self.gramm+=i.gramm
 
     def ejecutar(self,entorno,estat):
@@ -267,7 +271,7 @@ class newFor:
         self.gramm+='<tr><td>F2::= EXP|ASIGNA </td><td> F1=(EXP|ASIGNA); </td></tr>'
         self.vNodo.hijos.append(nodoAST('{ INSTRUCCIONES }',n+1))
         for i in instr:
-            self.vNodo.hijos[3].append(i.vNodo)
+            self.vNodo.hijos[3].hijos.append(i.vNodo)
             self.gramm+=i.gramm
         
     def ejecutar(self,entorno,estat):
@@ -307,7 +311,7 @@ class newCaso:
             self.vNodo.hijos.append(nodoAST('DEFAULT',n+1))
         self.vNodo.hijos.append(nodoAST('INSTRUCCIONES',n+2))
         for i in instr:
-            self.vNodo.hijos[1].append(i.vNodo)
+            self.vNodo.hijos[1].hijos.append(i.vNodo)
             self.gramm+=i.gramm
     
     def ejecutar(self,entorno,estat):

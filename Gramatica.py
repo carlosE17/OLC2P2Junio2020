@@ -64,7 +64,6 @@ tokens  = [
     'XORIGUAL',
     'MASMAS',
     'MENOSMENOS',
-    'FLECHA',
     'DECIMAL',
     'ENTERO',
     'CADENA',
@@ -117,7 +116,6 @@ t_ANDIGUAL   = r'&='
 t_XORIGUAL   = r'\^='
 t_MASMAS   = r'\+\+'
 t_MENOSMENOS   = r'--'
-t_FLECHA   = r'->'
 
 Lerr=[]
 noNodo=0
@@ -209,8 +207,8 @@ precedence = (
     ('left','ROTIZQ','ROTDER'),
     ('left','MAS','MENOS'),
     ('left','POR','DIVIDIDO','MODULO'),
-    ('right','UMENOS'),
-    ('left','PUNTO','FLECHA','PARA','PARC','CORCHA','CORCHC'),
+    ('right','UMENOS','UNOT','UAND','UCEJA','UINC','UDEC'),
+    ('left','PUNTO','PARA','PARC','CORCHA','CORCHC'),
     )
 
 # Definición de la gramática
@@ -371,7 +369,7 @@ def p_salto_instr(t) :
 def p_declaracion_instr(t) :
     'declaracion   : tipo ldecla_ PTCOMA'
     global noNodo
-    
+    t[0]=newDeclaracion(t[1],t[2],t.lexpos(1),t.lineno(1),noNodo)
     noNodo+=3
 
 def p_Ldecla(t) :
@@ -664,9 +662,9 @@ def p_expresion_binaria(t):
 
 def p_expresion_unaria(t):
     '''exp : MENOS exp %prec UMENOS
-            | AND exp %prec UMENOS
-            | NOT exp %prec UMENOS
-            | CEJA exp %prec UMENOS'''
+            | AND exp %prec UAND
+            | NOT exp %prec UNOT
+            | CEJA exp %prec UCEJA'''
     global noNodo
     if t[1] == '-'  : t[0] = newNegacion(t[2],t.lexpos(1),t.lineno(1),noNodo)
     elif t[1]== '&' : t[0] = newPuntero(t[2],t.lexpos(1),t.lineno(1),noNodo)
@@ -733,16 +731,46 @@ def p_exp_acceso_struct(t):
     noNodo+=5
 
 def p_exp_fcall(t):
-    'exp : llamadafuncion'
-    t[0]=t[1]
+    'exp   : ID PARA poslexp PARC  '
+    global noNodo
+    t[0]=newLlamadaInstr(t[1],t[3],t.lexpos(1),t.lineno(1),noNodo)
+    noNodo+=6
 
 def p_exp_arreglo(t):
-    'exp : LLAVEA lexp LLAVEC'
+    'exp : LLAVEA poslexp LLAVEC'
     global noNodo
     t[0]=newArreglo(t[2],t.lexpos(1),t.lineno(1),noNodo)
     noNodo+=5
 
+def p_exp_inc1(t):
+    'exp : MASMAS exp %prec UINC'
+    global noNodo
+    t[0]=newIncremento(t[2],1,t.lexpos(1),t.lineno(1),noNodo)
+    noNodo+=5
 
+def p_exp_inc2(t):
+    'exp : exp MASMAS %prec UINC '
+    global noNodo
+    t[0]=newIncremento(t[1],2,t.lexpos(1),t.lineno(1),noNodo)
+    noNodo+=5
+
+def p_exp_dec1(t):
+    'exp : MENOSMENOS exp %prec UDEC'
+    global noNodo
+    t[0]=newIncremento(t[2],1,t.lexpos(1),t.lineno(1),noNodo)
+    noNodo+=5
+
+def p_exp_dec2(t):
+    'exp : exp MENOSMENOS %prec UDEC '
+    global noNodo
+    t[0]=newIncremento(t[1],2,t.lexpos(1),t.lineno(1),noNodo)
+    noNodo+=5
+
+def p_exp_ternaria(t):
+    'exp : exp PREGUNTA exp DOSPTS exp '
+    global noNodo
+    t[0]=newTernaria(t[1],t[3],t[5],t.lexpos(1),t.lineno(1),noNodo)
+    noNodo+=5
 
 def p_error(t):
     global Lerr

@@ -1,7 +1,8 @@
 
 
 class Simbolo:
-    def __init__(self,tipo,valor,t):
+    def __init__(self,tipo,valor,t,L):
         self.tipo=tipo
-        self.valor=valor
-        self.temporal=t
+        self.valor=str(valor)
+        self.temporal=str(t)
+        self.linea=str(L)

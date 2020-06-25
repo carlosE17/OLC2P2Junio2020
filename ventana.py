@@ -7,17 +7,33 @@ import AST_Trad as AST_C3d
 import Entorno_Trad as Entorno_C3d
 import TipoTrad as tipo_C3d
 from graphviz import Source
+
+import gAscendente as agus
 import Gramatica as g1
 from CError import CError
 import Simbolo_Trad as s_C3d
 from PIL import ImageTk, Image
 import os
-rutas = []
 
-def traducir(Linstr,c,Le):
+# -------------------------------augus---------------------------
+import Tipo as TipoAugus
+import Entorno as EntornoAugus
+import AST as ASTaugus
+import Simbolo as SimboloAugus
+import Instruccion as InstruccionAugus
+
+
+# --------------------------------augus-------------------------
+
+rutas = []
+c3dPAraDebug=''
+
+def traducir(Linstr,c,Le,tabs):
     LErr=Le
     ast=AST_C3d.Estaticos(LErr)
     entornoG=Entorno_C3d.Entorno(None)
+    c3dPerFuncion={}
+    c3dVarGlobales=''
     try:
         i=0
         while i<len(Linstr):
@@ -26,6 +42,191 @@ def traducir(Linstr,c,Le):
     except Exception as e:
         print('veentana[33]'+str(e))
     
+    c3dOptimizado='main:\n'+c3dVarGlobales+'\n'
+    for k,v in c3dPerFuncion:
+        if k.lower()=='main': c3dOptimizado+=v+'\n'
+    c3dOptimizado+='return:\n'+ast.retornos+'\nexit; \n'
+
+    for k,v in c3dPerFuncion:
+        if k.lower()!='main': c3dOptimizado+=k+':\n'+v+'\n'
+    
+
+
+    editor = scrolledtext.ScrolledText(
+            undo=True, width=80, height=10, wrap=WORD)
+    editor['font'] = ('consolas', 12)
+    editor.focus()
+    t0 = 'C3d_Optimizado'
+    editor.insert(INSERT,c3dOptimizado )
+    tabs.add(editor, text=t0, padding=10)
+    rutas.append(t0+'.txt')
+
+    # correrAugus(c3dOptimizado,c)
+
+    c3dPAraDebug=c3dOptimizado
+
+    gReporteErrTraduccion(ast.Lerrores)
+    gReporteTsTraduccion(entornoG.tabla.items())
+    graphASTtraduccion(Linstr)
+
+def gReporteErrTraduccion(L):
+    if len(L)>0:
+        texto='digraph {\n'
+        t=''
+        repL=''
+        repS=''
+        repSem=''
+        for i in L:
+            t+=i.getTexto()
+            if i.tipo=='Lexico': repL+=i.getTexto()
+            elif i.tipo=='Sintactico': repS+=i.getTexto()
+            else: repSem+=i.getTexto()
+        texto += "node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>TIPO</td><td>Descripcion</td><td>Linea</td></tr>\n"+ t+ "    </table>\n" + ">];}"
+        with open('reporteErrores_minorC.dot', "w") as f:
+                f.write(texto)
+        texto = "digraph {\n node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>TIPO</td><td>Descripcion</td><td>Linea</td></tr>\n"+ repL+ "    </table>\n" + ">];}"
+        with open('reporteErroresLexicos_minorC.dot', "w") as f:
+                f.write(texto)
+        texto = "digraph {\n node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>TIPO</td><td>Descripcion</td><td>Linea</td></tr>\n"+ repS+ "    </table>\n" + ">];}"
+        with open('reporteErroresSintacticos_minorC.dot', "w") as f:
+                f.write(texto)
+        texto = "digraph {\n node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>TIPO</td><td>Descripcion</td><td>Linea</td></tr>\n"+ repSem+ "    </table>\n" + ">];}"
+        with open('reporteErroresSemanticos_minorC.dot', "w") as f:
+                f.write(texto)
+    else:
+        t='digraph G {\"No hay errores\"}'
+        with open('reporteErrores_minorC.dot', "w") as f:
+                f.write(t)
+        with open('reporteErroresLexicos_minorC.dot', "w") as f:
+                f.write(t)
+        with open('reporteErroresSintacticos_minorC.dot', "w") as f:
+                f.write(t)
+        with open('reporteErroresSemanticos_minorC.dot', "w") as f:
+                f.write(t)
+
+def gReporteTsTraduccion(L):
+    texto='digraph {\n'
+    t=''
+    for k,v in L:
+        t+="<tr> <td> " + str(k) + "</td><td> " + str(v.tipo.name) + " </td><td> " + v.temporal + " </td><td> " + v.valor + " </td><td> "+ v.linea + "</td> </tr>"
+
+    texto += "node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>ID</td><td>Tipo</td><td>Temporal</td><td>valor</td><td>Linea</td></tr>\n"+ t+ "    </table>\n" + ">];}"
+    with open('reporteTs_minorC.dot', "w") as f:
+        f.write(texto)
+
+        
+def graphASTtraduccion(L):
+    if len(L)!=0:
+        t='digraph Q { \n  node [shape=record];\n'
+        for i in L:
+            t+='node'+i.vNodo.nNodo+'[label=\"'+i.vNodo.vNodo+'\"];\n'
+            t+='p_inicio ->'+'node'+i.vNodo.nNodo+';\n'
+            t+=dibujo(i.vNodo)
+        t+='\n}'
+        with open('reporteAST_minorC.dot', "w") as f:
+                f.write(t)
+    else:
+        with open('reporteAST_minorC.dot', "w") as f:
+                f.write('digraph G {\"No hay instrucciones\"}')
+
+def dibujo(n):
+    t=''
+    for i in n.hijos:
+        t+='node'+i.nNodo+'[label=\"'+i.vNodo+'\"];\n'
+        t+='node'+n.nNodo+' -> node'+i.nNodo+';\n'
+        t+=dibujo(i)
+    return t
+
+def gramRepoTraduccion(L):
+    texto='digraph {\n'
+    t='<tr><td>INICIO::= INSTRUCCIONES </td><td> INICIO=INSTRUCCIONES; </td></tr>\n'
+
+    for i in L:
+        t+=i.gramm+'\n'
+    texto += "node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>PRODUCCION</td><td>ACCIONES</td></tr>\n"+ t+ "    </table>\n" + ">];}"
+    with open('reporteGramatical_minorC.dot', "w") as f:
+        f.write(texto)
+
+# --------------------------------------------------------------------integracion augus------------------------------------------
+
+def correrAugus(texto,salida):
+    agus.resetLerr()
+    agus.resetNonodo()
+    resultado=agus.parse(texto)
+
+    salida.delete('1.0', END)
+    salida.insert(INSERT, "Output:\n")
+
+    Ejec(resultado,salida,agus.Lerr)
+    gramRepo(resultado,1)
+    if len(agus.Lerr)>0 :
+        tkinter.messagebox.showerror(
+            "Error", "Se encontraron errores al ejecutar")
+        s = Source.from_file("reporteErrores.dot", format="pdf")
+        s.view()
+
+def Ejec(Linstr,c,Le):
+    LErr=Le
+    ast=ASTaugus.Estaticos(c,LErr,len(Linstr))
+    entornoG=EntornoAugus.Entorno()
+    iEt=0
+    try:
+        while iEt<len(Linstr):
+            if(isinstance(Linstr[iEt],InstruccionAugus.newEtiqueta)):
+                if Linstr[iEt].label_ in entornoG.etiquetas:
+                    ast.Lerrores.append(CError('Semantico','La etiqueta \''+Linstr[iEt].label_+'\' ya fue declarada',0,iEt+1))
+
+                entornoG.addEtiqueta(Linstr[iEt].label_,iEt)
+            iEt+=1
+    except Exception as e:
+        print('ventana[178] '+e)
+
+    if isinstance(Linstr[0],InstruccionAugus.newEtiqueta):
+        if str(Linstr[0].label_).lower()!='main':
+            ast.Lerrores.append(CError('Semantico','no se encontro la etiqueta Main al inicio',0,1))
+    else:
+        ast.Lerrores.append(CError('Semantico','no se encontro la etiqueta Main al inicio',0,1))
+
+
+    try:
+        while ast.i<len(Linstr):
+            Linstr[ast.i].ejecutar(entornoG,ast)
+            ast.i+=1
+    except Exception as e:
+        print('veentana[192]'+str(e))
+    # generar reportes de errores, y graficar el arbol---------------------------------------------------------------------
+    try:
+        i_0=0
+        while i_0<len(Linstr):
+            if isinstance(Linstr[i_0],InstruccionAugus.newEtiqueta):
+                entornoG.actualizar(str(Linstr[i_0].label_),SimboloAugus.Simbolo(TipoAugus.tipoPrimitivo.labl,str(Linstr[i_0].label_)+':'))
+            i_0+=1
+
+
+        i_0=0
+        while i_0<len(Linstr):
+            tpo_=TipoAugus.tipoPrimitivo.labl
+
+            if isinstance(Linstr[i_0],InstruccionAugus.newSalto):
+                if i_0>0 and i_0<len(Linstr):
+                    if isinstance(Linstr[i_0-1],InstruccionAugus.newAsignacion):
+                        if '$a' in str(Linstr[i_0-1].id).lower():
+                            tpo_=TipoAugus.tipoPrimitivo.met1
+                        elif '$v' in str(Linstr[i_0-1].id).lower():
+                            tpo_=TipoAugus.tipoPrimitivo.fun1
+                entornoG.actualizar(str(Linstr[i_0].label_),SimboloAugus.Simbolo(tpo_,str(Linstr[i_0].label_)+':'))
+            elif isinstance(Linstr[i_0],InstruccionAugus.newIF):
+                if i_0>0 and i_0<len(Linstr):
+                    if isinstance(Linstr[i_0-1],InstruccionAugus.newAsignacion):
+                        if '$a' in str(Linstr[i_0-1].id).lower():
+                            tpo_=TipoAugus.tipoPrimitivo.met1
+                        elif '$v' in str(Linstr[i_0-1].id).lower():
+                            tpo_=TipoAugus.tipoPrimitivo.fun1
+                entornoG.actualizar(str(Linstr[i_0].label),SimboloAugus.Simbolo(tpo_,str(Linstr[i_0].label)+':'))
+
+            i_0+=1
+    except Exception as e:
+        print('veentana[225]'+str(e))
     
     gReporteErr(ast.Lerrores)
     gReporteTs(entornoG.tabla.items(),entornoG.etiquetas)
@@ -86,7 +287,6 @@ def gReporteTs(L,etiq):
     texto += "node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>ID</td><td>Tipo</td><td>Valor</td><td>Dimension</td><td>Linea</td><td>Referencia</td></tr>\n"+ t+ "    </table>\n" + ">];}"
     with open('reporteTs.dot', "w") as f:
         f.write(texto)
-
         
 def graphAST(L):
     if len(L)!=0:
@@ -102,17 +302,15 @@ def graphAST(L):
         with open('reporteAST.dot', "w") as f:
                 f.write('digraph G {\"No hay instrucciones\"}')
 
-def dibujo(n):
-    t=''
-    for i in n.hijos:
-        t+='node'+i.nNodo+'[label=\"'+i.vNodo+'\"];\n'
-        t+='node'+n.nNodo+' -> node'+i.nNodo+';\n'
-        t+=dibujo(i)
-    return t
-
-def gramRepo(L):
+def gramRepo(L,s):
     texto='digraph {\n'
     t='<tr><td>INICIO::= INSTRUCCIONES </td><td> INICIO=INSTRUCCIONES; </td></tr>\n'
+    if s==1:
+        t+='<tr><td>INSTRUCCIONES::= INSTRUCCIONES1 INSTRUCCION </td><td> INSTRUCCIONES=INSTRUCCIONES1; INSTRUCCIONES.append(INSTRUCCION); </td></tr>\n'
+        t+='<tr><td>INSTRUCCIONES::= INSTRUCCION </td><td> INSTRUCCIONES=[]; INSTRUCCIONES.append(INSTRUCCION); </td></tr>\n'
+    else:
+        t+='<tr><td>INSTRUCCIONES::=  INSTRUCCION INSTRUCCIONES1</td><td> INSTRUCCIONES=INSTRUCCIONES1; INSTRUCCIONES.append(INSTRUCCION); </td></tr>\n'
+        t+='<tr><td>INSTRUCCIONES::=  </td><td> INSTRUCCIONES=[];  </td></tr>\n'
 
     for i in L:
         t+=i.gramm+'\n'
@@ -122,6 +320,9 @@ def gramRepo(L):
 
     
 
+
+
+# -------------------------------------------------------------------fin augus-----------------------------------------------------
 
 class Ventana:
 
@@ -142,15 +343,20 @@ class Ventana:
         menuColores = Menu(barraMenu)
         menuDebug = Menu(barraMenu)
         menuAyuda = Menu(barraMenu)
-        menuReportes=Menu(barraMenu)
+        menuReportesc3d=Menu(barraMenu)
         menuEditar=Menu(barraMenu)
+        menuRepoImgc3d=Menu(barraMenu)
+
+        menuReportes=Menu(barraMenu)
         menuRepoImg=Menu(barraMenu)
 
         barraMenu.add_cascade(label="Archivo", menu=menuArchivos)
         barraMenu.add_cascade(label="Colores", menu=menuColores)
         barraMenu.add_cascade(label="Debugger", menu=menuDebug)
-        barraMenu.add_cascade(label="Reportes PDF",menu=menuReportes)
-        barraMenu.add_cascade(label="Reportes in App",menu=menuRepoImg)
+        barraMenu.add_cascade(label="Reportes minorC PDF",menu=menuReportesc3d)
+        barraMenu.add_cascade(label="Reportes minorC in App",menu=menuRepoImgc3d)
+        barraMenu.add_cascade(label="Reportes PDF Augus",menu=menuReportes)
+        barraMenu.add_cascade(label="Reportes in App Augus",menu=menuRepoImg)
         barraMenu.add_cascade(label='Editar',menu=menuEditar)
         barraMenu.add_cascade(label="Ayuda", menu=menuAyuda)
         
@@ -168,6 +374,28 @@ class Ventana:
         menuColores.add_command(label="morado", command=self.color4)
 
         menuDebug.add_command(label="debuggear", command=self.debugg)
+
+        menuReportesc3d.add_command(label='Todos los Errores',command=self.repoErroresc3d)
+        menuReportesc3d.add_separator()
+        menuReportesc3d.add_command(label="Errores Lexicos", command=self.errLexc3d)
+        menuReportesc3d.add_command(label="Errores Sintacticos", command=self.errSinc3d)
+        menuReportesc3d.add_command(label="Errores Semanticos", command=self.errSemc3d)
+        menuReportesc3d.add_separator()
+        menuReportesc3d.add_command(label="Tabla de Simbolos", command=self.tbSimbc3d)
+        menuReportesc3d.add_command(label="AST",command=self.astRepoc3d)
+        menuReportesc3d.add_command(label="Reporte Gramatical", command=self.repoGramc3d)
+        # 0000
+        menuRepoImgc3d.add_command(label='Todos los Errores',command=self.repoErrores2c3d)
+        menuRepoImgc3d.add_separator()
+        menuRepoImgc3d.add_command(label="Errores Lexicos", command=self.errLex2c3d)
+        menuRepoImgc3d.add_command(label="Errores Sintacticos", command=self.errSin2c3d)
+        menuRepoImgc3d.add_command(label="Errores Semanticos", command=self.errSem2c3d)
+        menuRepoImgc3d.add_separator()
+        menuRepoImgc3d.add_command(label="Tabla de Simbolos", command=self.tbSimb2c3d)
+        menuRepoImgc3d.add_command(label="AST",command=self.astRepo2c3d)
+        menuRepoImgc3d.add_command(label="Reporte Gramatical", command=self.repoGram2c3d)
+        
+        # -------------------------------------------------------------------------------------------------augus------------
 
         menuReportes.add_command(label='Todos los Errores',command=self.repoErrores)
         menuReportes.add_separator()
@@ -188,7 +416,9 @@ class Ventana:
         menuRepoImg.add_command(label="Tabla de Simbolos", command=self.tbSimb2)
         menuRepoImg.add_command(label="AST",command=self.astRepo2)
         menuRepoImg.add_command(label="Reporte Gramatical", command=self.repoGram2)
-        
+
+
+        # -----------------------------------------------------------------augus-----------------------------------------------
 
 
         menuEditar.add_command(label='Copiar',command=self.copiartxt)
@@ -262,12 +492,13 @@ class Ventana:
         g1.resetLerr()
         g1.resetNonodo()
         resultado=g1.parse(txtEntrada)
-        traducir(resultado,self.salida,g1.Lerr)
-        gramRepo(resultado)
+        traducir(resultado,self.salida,g1.Lerr,self.ventanas)
+        self.nVentanas+=1
+        gramRepoTraduccion(resultado)
         if len(g1.Lerr)>0:
             tkinter.messagebox.showerror(
                 "Error", "Se encontraron errores al ejecutar")
-            s = Source.from_file("reporteErrores.dot", format="pdf")
+            s = Source.from_file("reporteErrores_minorC.dot", format="pdf")
             s.view()
 
     def nuevo(self):
@@ -347,26 +578,101 @@ class Ventana:
             message="Carlos Rodrigo Estrada Najarro\nCarnet: 201700314", title="About Us")
 
     def debugg(self):
-        if not (len(self.ventanas.tabs()) != 0 and len(rutas) > self.ventanas.index('current')):
+
+
+        if c3dPAraDebug=='':
             tkinter.messagebox.showerror(
                 "Error", "No se encontro consola de entrada de texto")
             return
 
-        # txtEntrada = self.getTextoActual()
-        # if len(txtEntrada)==0:
-        #     return
-        # self.salida.delete('1.0', END)
-        # self.salida.insert(INSERT, "Output:\n")
-        # g1.resetLerr()
-        # g1.resetNonodo()
-        # resultado=g1.parse(txtEntrada)
-        # self.astDebug=Estaticos(g1.Lerr)
-        # self.entornoDebug=Entorno()
-        # self.Ldebugger=resultado
-        # self.iDEbugg_=0
+        txtEntrada = c3dPAraDebug
+        if len(txtEntrada)==0:
+            return
+        self.salida.delete('1.0', END)
+        self.salida.insert(INSERT, "Output:\n")
+        agus.resetLerr()
+        agus.resetNonodo()
+        resultado=agus.parse(txtEntrada)
+        self.astDebug=ASTaugus.Estaticos(self.salida,agus.Lerr,len(resultado))
+        self.entornoDebug=EntornoAugus.Entorno()
+        self.Ldebugger=resultado
+        iEt=0
+        try:
+            while iEt<len(resultado):
+                if(isinstance(resultado[iEt],InstruccionAugus.newEtiqueta)):
+                    self.entornoDebug.addEtiqueta(resultado[iEt].label_,iEt)
+                iEt+=1
+        except Exception as e:
+            print('ventana[292] '+e)
 
-        # self.btnNext.config(state=NORMAL)
+        self.btnNext.config(state=NORMAL)
 
+    def errLexc3d(self):
+        s = Source.from_file("reporteErroresLexicos_minorC.dot", format="pdf")
+        s.view()
+    def errSinc3d(self):
+        s = Source.from_file("reporteErroresSintacticos_minorC.dot", format="pdf")
+        s.view()
+    def errSemc3d(self):
+        s = Source.from_file("reporteErroresSemanticos_minorC.dot", format="pdf")
+        s.view()
+    def tbSimbc3d(self):
+        s = Source.from_file("reporteTs_minorC.dot", format="pdf")
+        s.view()
+    def astRepoc3d(self):
+        s = Source.from_file("reporteAST_minorC.dot", format="pdf")
+        s.view()
+    def repoGramc3d(self):
+        s = Source.from_file("reporteGramatical_minorC.dot", format="pdf")
+        s.view()
+    def repoErroresc3d(self):
+        s = Source.from_file("reporteErrores_minorC.dot", format="pdf")
+        s.view()
+        # -----------------------------------------
+    def errLex2c3d(self):
+        s = Source.from_file("reporteErroresLexicos_minorC.dot", format="png")
+        s.render()
+        parent = self.salida.master
+        entrada=popupRepo(parent,'reporteErroresLexicos_minorC.dot.png')
+        parent.wait_window(entrada.top)
+    def errSin2c3d(self):
+        s = Source.from_file("reporteErroresSintacticos_minorC.dot", format="png")
+        s.render()
+        parent = self.salida.master
+        entrada=popupRepo(parent,'reporteErroresSintacticos_minorC.dot.png')
+        parent.wait_window(entrada.top)
+    def errSem2c3d(self):
+        s = Source.from_file("reporteErroresSemanticos_minorC.dot", format="png")
+        s.render()
+        parent = self.salida.master
+        entrada=popupRepo(parent,'reporteErroresSemanticos_minorC.dot.png')
+        parent.wait_window(entrada.top)
+    def tbSimb2c3d(self):
+        s = Source.from_file("reporteTs_minorC.dot", format="png")
+        s.render()
+        parent = self.salida.master
+        entrada=popupRepo(parent,'reporteTs_minorC.dot.png')
+        parent.wait_window(entrada.top)
+    def astRepo2c3d(self):
+        s = Source.from_file("reporteAST_minorC.dot", format="png")
+        s.render()
+        parent = self.salida.master
+        entrada=popupRepo(parent,'reporteAST_minorC.dot.png')
+        parent.wait_window(entrada.top)
+    def repoGram2c3d(self):
+        s = Source.from_file("reporteGramatical_minorC.dot", format="png")
+        s.render()
+        parent = self.salida.master
+        entrada=popupRepo(parent,'reporteGramatical_minorC.dot.png')
+        parent.wait_window(entrada.top)
+    def repoErrores2c3d(self):
+        s = Source.from_file("reporteErrores_minorC.dot", format="png")
+        s.render()
+        parent = self.salida.master
+        entrada=popupRepo(parent,'reporteErrores_minorC.dot.png')
+        parent.wait_window(entrada.top)
+    
+# -----------------
     def errLex(self):
         s = Source.from_file("reporteErroresLexicos.dot", format="pdf")
         s.view()
@@ -431,22 +737,54 @@ class Ventana:
         parent = self.salida.master
         entrada=popupRepo(parent,'reporteErrores.dot.png')
         parent.wait_window(entrada.top)
-    
+
+
     def nextDebug(self):
-        print('')
-        # try:
-        #     if self.iDEbugg_<len(self.Ldebugger):
-        #         self.Ldebugger[self.iDEbugg_].ejecutar(self.entornoDebug,self.astDebug)
-        #         self.iDEbugg_+=1
-        #     else:
-        #         self.btnNext.config(state=DISABLED)
-        #         graphAST(self.Ldebugger)                
-        # except Exception as e:
-        #     print(str(e)+'ventana[314]')
-        #     self.iDEbugg_+=1
-        # # generar reportes de errores, y graficar el arbol
-        # gReporteErr(self.astDebug.Lerrores)
-        # gReporteTs(self.entornoDebug.tabla.items(),self.entornoDebug.etiquetas)
+        try:
+            if self.astDebug.i<len(self.Ldebugger):
+                self.Ldebugger[self.astDebug.i].ejecutar(self.entornoDebug,self.astDebug)
+                self.astDebug.i+=1
+            else:
+                try:
+                    i_0=0
+                    while i_0<len(self.Ldebugger):
+                        if isinstance(self.Ldebugger[i_0],InstruccionAugus.newEtiqueta):
+                            self.entornoDebug.actualizar(str(self.Ldebugger[i_0].label_),SimboloAugus.Simbolo(TipoAugus.tipoPrimitivo.labl,str(self.Ldebugger[i_0].label_)+':'))
+                        i_0+=1
+
+
+                    i_0=0
+                    while i_0<len(self.Ldebugger):
+                        tpo_=TipoAugus.tipoPrimitivo.labl
+
+                        if isinstance(self.Ldebugger[i_0],InstruccionAugus.newSalto):
+                            if i_0>0 and i_0<len(self.Ldebugger):
+                                if isinstance(self.Ldebugger[i_0-1],InstruccionAugus.newAsignacion):
+                                    if '$a' in str(self.Ldebugger[i_0-1].id).lower():
+                                        tpo_=TipoAugus.tipoPrimitivo.met1
+                                    elif '$v' in str(self.Ldebugger[i_0-1].id).lower():
+                                        tpo_=TipoAugus.tipoPrimitivo.fun1
+                            self.entornoDebug.actualizar(str(self.Ldebugger[i_0].label_),SimboloAugus.Simbolo(tpo_,str(self.Ldebugger[i_0].label_)+':'))
+                        elif isinstance(self.Ldebugger[i_0],InstruccionAugus.newIF):
+                            if i_0>0 and i_0<len(self.Ldebugger):
+                                if isinstance(self.Ldebugger[i_0-1],InstruccionAugus.newAsignacion):
+                                    if '$a' in str(self.Ldebugger[i_0-1].id).lower():
+                                        tpo_=TipoAugus.tipoPrimitivo.met1
+                                    elif '$v' in str(self.Ldebugger[i_0-1].id).lower():
+                                        tpo_=TipoAugus.tipoPrimitivo.fun1
+                            self.entornoDebug.actualizar(str(self.Ldebugger[i_0].label),SimboloAugus.Simbolo(tpo_,str(self.Ldebugger[i_0].label)+':'))
+
+                        i_0+=1
+                except Exception as e:
+                    print('veentana[466]'+str(e))
+                self.btnNext.config(state=DISABLED)
+                graphAST(self.Ldebugger)                
+        except Exception as e:
+            print(str(e)+'ventana[314]')
+            self.astDebug.i+=1
+        # generar reportes de errores, y graficar el arbol
+        gReporteErr(self.astDebug.Lerrores)
+        gReporteTs(self.entornoDebug.tabla.items(),self.entornoDebug.etiquetas)
 
     def copiartxt(self):
         if not (len(self.ventanas.tabs()) != 0 and len(rutas) > self.ventanas.index('current')):
