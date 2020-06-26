@@ -1,0 +1,16 @@
+digraph {
+node0 [    shape=plaintext
+    label=<
+
+      <table cellspacing='0'>
+      <tr><td>PRODUCCION</td><td>ACCIONES</td></tr>
+<tr><td>INICIO::= INSTRUCCIONES </td><td> INICIO=INSTRUCCIONES; </td></tr>
+<tr><td>INSTRUCCIONES::= INSTRUCCIONES1 INSTRUCCION </td><td> INSTRUCCIONES=INSTRUCCIONES1; INSTRUCCIONES.append(INSTRUCCION); </td></tr>
+<tr><td>INSTRUCCIONES::= INSTRUCCION </td><td> INSTRUCCIONES=[]; INSTRUCCIONES.append(INSTRUCCION); </td></tr>
+<tr><td>INSTRUCCION::= LABEL : </td><td> INSTRUCCION=newEtiqueta(LABEL); </td></tr>
+<tr><td>LABEL::= main : </td><td> LABEL=main;  </td></tr>
+<tr><td>INSTRUCCION::= LABEL : </td><td> INSTRUCCION=newEtiqueta(LABEL); </td></tr>
+<tr><td>LABEL::= return : </td><td> LABEL=return;  </td></tr>
+<tr><td>INSTRUCCION::= EXIT ; </td><td> INSTRUCCION=newSalir(); </td></tr>
+    </table>
+>];}

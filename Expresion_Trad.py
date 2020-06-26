@@ -10,9 +10,11 @@ class primitivo:
         self.vNodo=nodoAST(v,n)
         self.valor=v
         self.tipo=t
-        self.gramm='\n<tr><td>PRIMITIVO::= '+str(v)+' </td><td> PRIMITIVO= primitivo('+str(v)+');  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= '+str(v)+' </td><td> EXP= primitivo('+str(v)+');  </td></tr>'
     def getvalor(self,entorno,estat):
-        return self
+        v=self.valor
+        if self.tipo.tipo==tipoPrimitivo.Cadena or self.tipo.tipo==tipoPrimitivo.caracter: v='\"'+v+"\""
+        return nodoC3d(v,self.tipo,'',[],[],self.valor)
 
     def ejecutar(self,entorno,estat):
         return self.getvalor(entorno,estat)
@@ -24,14 +26,17 @@ class id_:
         self.vNodo=nodoAST(d,n)
         self.variable=d
         # self.tipo=tipoPrimitivo.variable
-        self.gramm='\n<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>'
         self.gramm+='\n<tr><td>ID::= '+str(d)+' </td><td> ID= id_('+str(d)+');  </td></tr>'
     def getvalor(self,entorno,estat):
         temp=entorno.buscar(self.variable,self.columna,self.linea,estat)
         if temp!=None:
-            return temp.valor.getvalor(entorno,estat)
+            return nodoC3d(temp.temporal,temp.tipo,'',[],[],temp.valor)
         else:
-            return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+            return nodoC3d(temp.temporal,newtipo(tipoPrimitivo.Error,''),'',[],[],temp.valor)
+    
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 
 class newSuma:
@@ -43,29 +48,119 @@ class newSuma:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 + EXP2 </td><td> EXP= newSuma(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
         izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Entero,int(izq.valor)+int(der.valor),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Doble,float(int(izq.valor)+float(der.valor)),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)+int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)+float(der.valor)),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Cadena:
-            if der.tipo==tipoPrimitivo.Cadena:
-                return primitivo(tipoPrimitivo.Cadena,str(izq.valor)+str(der.valor),self.columna,self.linea,0)
+        if izq.tipo.tipo==tipoPrimitivo.Entero:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' + '+der.temporal+';\n'
+                v=izq.temporal+' + '+der.temporal
+                
+                if der.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=izq.temporal
+                    v=izq.valor
+                elif izq.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' + '+der.temporal+';\n'
+                v=izq.temporal+' + '+der.temporal
+                
+                if izq.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.caracter:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = '+izq.temporal+' + '+t+';\n'
+                v=izq.temporal+' + '+der.temporal
+
+                if izq.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    t2=t
+                    v=der.valor
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.Doble:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' + '+der.temporal+';\n'
+                v=izq.temporal+' + '+der.temporal
+                
+                if izq.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' + '+der.temporal+';\n'
+                v=izq.temporal+' + '+der.temporal
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.caracter:
+            if der.tipo.tipo==tipoPrimitivo.caracter:
+
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                t3=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = (int) '+izq.temporal+';\n'+t3+' = '+t+' + '+t2+';\n'
+                v=izq.temporal+' + '+der.temporal
+
+
+                return nodoC3d(t3,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
+                c+=t2+' = '+der.temporal+' + '+t+';\n'
+                v=izq.temporal+' + '+der.temporal
+
+                if der.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    t2=t
+                    v=der.valor
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+
         
-        estat.Lerrores.append(CError('Semantico','Error al realizar la SUMA',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        if der.tipo.tipo == tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:        
+            estat.Lerrores.append(CError('Semantico','Error en suma',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'+'+der.temporal+';\n'
+        v=izq.temporal+' + '+der.temporal
+
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
+
+
 
 class newResta:
     def __init__(self,izq,der,c,l,n):
@@ -76,26 +171,117 @@ class newResta:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 - PRIMITIVO2 </td><td> EXP= newResta(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 - EXP2 </td><td> EXP= newResta(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
         izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Entero,int(izq.valor)-int(der.valor),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Doble,float(int(izq.valor)-float(der.valor)),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)-int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)-float(der.valor)),self.columna,self.linea,0)
+        if izq.tipo.tipo==tipoPrimitivo.Entero:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' - '+der.temporal+';\n'
+                v=izq.temporal+' - '+der.temporal
+                
+                if der.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=izq.temporal
+                    v=izq.valor
+                elif izq.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' - '+der.temporal+';\n'
+                v=izq.temporal+' - '+der.temporal
+                
+                if izq.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.caracter:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = '+izq.temporal+' - '+t+';\n'
+                v=izq.temporal+' - '+der.temporal
+
+                if izq.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    t2=t
+                    v=der.valor
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.Doble:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' - '+der.temporal+';\n'
+                v=izq.temporal+' - '+der.temporal
+                
+                if izq.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' - '+der.temporal+';\n'
+                v=izq.temporal+' - '+der.temporal
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.caracter:
+            if der.tipo.tipo==tipoPrimitivo.caracter:
+
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                t3=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = (int) '+izq.temporal+';\n'+t3+' = '+t+' - '+t2+';\n'
+                v=izq.temporal+' - '+der.temporal
+
+
+                return nodoC3d(t3,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
+                c+=t2+' = '+der.temporal+' - '+t+';\n'
+                v=izq.temporal+' - '+der.temporal
+
+                if der.valor=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    t2=t
+                    v=der.valor
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+
         
-        estat.Lerrores.append(CError('Semantico','Error al realizar la RESTA',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        if der.tipo.tipo == tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:        
+            estat.Lerrores.append(CError('Semantico','Error en -',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'-'+der.temporal+';\n'
+        v=izq.temporal+' - '+der.temporal
+
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newMultiplicacion:
     def __init__(self,izq,der,c,l,n):
@@ -106,26 +292,117 @@ class newMultiplicacion:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 * PRIMITIVO2 </td><td> EXP= newMultiplicacion(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 * EXP2 </td><td> EXP= newMultiplicacion(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
         izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Entero,int(izq.valor)*int(der.valor),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Doble,float(int(izq.valor)*float(der.valor)),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)*int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)*float(der.valor)),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar la MULTIPLICACION',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        if izq.tipo.tipo==tipoPrimitivo.Entero:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' * '+der.temporal+';\n'
+                v=izq.temporal+' * '+der.temporal
+                
+                if der.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=izq.temporal
+                    v=izq.valor
+                elif izq.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' * '+der.temporal+';\n'
+                v=izq.temporal+' * '+der.temporal
+                
+                if izq.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.caracter:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = '+izq.temporal+' * '+t+';\n'
+                v=izq.temporal+' * '+der.temporal
+
+                if izq.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    t2=t
+                    v=der.valor
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.Doble:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' * '+der.temporal+';\n'
+                v=izq.temporal+' * '+der.temporal
+                
+                if izq.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' * '+der.temporal+';\n'
+                v=izq.temporal+' * '+der.temporal
+                # ----------------------------------------------------------------------------------------------------
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.caracter:
+            if der.tipo.tipo==tipoPrimitivo.caracter:
+
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                t3=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = (int) '+izq.temporal+';\n'+t3+' = '+t+' * '+t2+';\n'
+                v=izq.temporal+' * '+der.temporal
+
+
+                return nodoC3d(t3,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
+                c+=t2+' = '+der.temporal+' * '+t+';\n'
+                v=izq.temporal+' * '+der.temporal
+
+                if der.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    t2=t
+                    v=der.valor
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+
+        if der.tipo.tipo == tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:        
+            estat.Lerrores.append(CError('Semantico','Error en *',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'*'+der.temporal+';\n'
+        v=izq.temporal+' * '+der.temporal
+
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
+
 
 class newDivision:
     def __init__(self,izq,der,c,l,n):
@@ -136,42 +413,117 @@ class newDivision:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 / PRIMITIVO2 </td><td> EXP= newDivision(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 / EXP2 </td><td> EXP= newDivision(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
         izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                if float(der.valor)==0:
-                    estat.Lerrores.append(CError('Semantico','No se puede dividir dentro de 0',self.columna,self.linea))
-                    return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        if izq.tipo.tipo==tipoPrimitivo.Entero:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' / '+der.temporal+';\n'
+                v=izq.temporal+' / '+der.temporal
+                
+                if der.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=izq.temporal
+                    v=izq.valor
+                elif izq.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
 
-                return primitivo(tipoPrimitivo.Doble,float(int(izq.valor)/int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                if float(der.valor)==0:
-                    estat.Lerrores.append(CError('Semantico','No se puede dividir dentro de 0',self.columna,self.linea))
-                    return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
-                return primitivo(tipoPrimitivo.Doble,float(int(izq.valor)/float(der.valor)),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero:
-                if float(der.valor)==0:
-                    estat.Lerrores.append(CError('Semantico','No se puede dividir dentro de 0',self.columna,self.linea))
-                    return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' / '+der.temporal+';\n'
+                v=izq.temporal+' / '+der.temporal
+                
+                if izq.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
 
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)/int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                if float(der.valor)==0:
-                    estat.Lerrores.append(CError('Semantico','No se puede dividir dentro de 0',self.columna,self.linea))
-                    return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)/float(der.valor)),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar la DIVISION',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+            elif der.tipo.tipo==tipoPrimitivo.caracter:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = '+izq.temporal+' / '+t+';\n'
+                v=izq.temporal+' / '+der.temporal
+
+                if izq.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    t2=t
+                    v=der.valor
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.Doble:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' / '+der.temporal+';\n'
+                v=izq.temporal+' / '+der.temporal
+                
+                if izq.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'
+                    t=der.temporal
+                    v=der.valor
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' / '+der.temporal+';\n'
+                v=izq.temporal+' / '+der.temporal
+                # ----------------------------------------------------------------------------------------------------
+                return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.caracter:
+            if der.tipo.tipo==tipoPrimitivo.caracter:
+
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                t3=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = (int) '+izq.temporal+';\n'+t3+' = '+t+' / '+t2+';\n'
+                v=izq.temporal+' / '+der.temporal
+
+
+                return nodoC3d(t3,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
+                c+=t2+' = '+der.temporal+' / '+t+';\n'
+                v=izq.temporal+' / '+der.temporal
+
+                if der.valor=='1':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    t2=t
+                    v=der.valor
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
+
+
+        if der.tipo.tipo == tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:        
+            estat.Lerrores.append(CError('Semantico','Error en /',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'/'+der.temporal+';\n'
+        v=izq.temporal+' / '+der.temporal
+
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
+
 
 class newModulo:
     def __init__(self,izq,der,c,l,n):
@@ -182,43 +534,94 @@ class newModulo:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 % PRIMITIVO2 </td><td> EXP= newModulo(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 % _Exp2 </td><td> EXP= newModulo(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
         izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                if float(der.valor)==0:
-                    estat.Lerrores.append(CError('Semantico','No se puede dividir dentro de 0',self.columna,self.linea))
-                    return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        if izq.tipo.tipo==tipoPrimitivo.Entero:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' % '+der.temporal+';\n'
+                v=izq.temporal+' % '+der.temporal
+                
 
-                return primitivo(tipoPrimitivo.Doble,float(int(izq.valor)%int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                if float(der.valor)==0:
-                    estat.Lerrores.append(CError('Semantico','No se puede dividir dentro de 0',self.columna,self.linea))
-                    return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
-                return primitivo(tipoPrimitivo.Doble,float(int(izq.valor)%float(der.valor)),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero:
-                if float(der.valor)==0:
-                    estat.Lerrores.append(CError('Semantico','No se puede dividir dentro de 0',self.columna,self.linea))
-                    return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' % '+der.temporal+';\n'
+                v=izq.temporal+' % '+der.temporal
 
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)%int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                if float(der.valor)==0:
-                    estat.Lerrores.append(CError('Semantico','No se puede dividir dentro de 0',self.columna,self.linea))
-                    return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
 
-                return primitivo(tipoPrimitivo.Doble,float(float(izq.valor)%float(der.valor)),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar MODULO',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
+            elif der.tipo.tipo==tipoPrimitivo.caracter:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = '+izq.temporal+' % '+t+';\n'
+                v=izq.temporal+' % '+der.temporal
+
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.Doble:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' % '+der.temporal+';\n'
+                v=izq.temporal+' % '+der.temporal
+                
+ 
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' % '+der.temporal+';\n'
+                v=izq.temporal+' % '+der.temporal
+                # ----------------------------------------------------------------------------------------------------
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.caracter:
+            if der.tipo.tipo==tipoPrimitivo.caracter:
+
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                t3=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = (int) '+izq.temporal+';\n'+t3+' = '+t+' % '+t2+';\n'
+                v=izq.temporal+' % '+der.temporal
+
+
+                return nodoC3d(t3,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
+                c+=t2+' = '+der.temporal+' % '+t+';\n'
+                v=izq.temporal+' % '+der.temporal
+
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+
+        if der.tipo.tipo == tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:        
+            estat.Lerrores.append(CError('Semantico','Error en %',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'%'+der.temporal+';\n'
+        v=izq.temporal+' % '+der.temporal
+
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newAnd:
     def __init__(self,izq,der,c,l,n):
@@ -229,27 +632,89 @@ class newAnd:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 and and PRIMITIVO2 </td><td> EXP= newAnd(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= exp and and exp2 </td><td> EXP= newAnd(exp,exp2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
         izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                if(int(izq.valor)!=0):
-                    izq=1
-                else:
-                    izq=0
-                if(int(der.valor)!=0):
-                    der=1
-                else:
-                    der=0
-                return primitivo(tipoPrimitivo.Entero,izq and der,self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar And',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        if izq.tipo.tipo==tipoPrimitivo.Entero:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' && '+der.temporal+';\n'
+                v=izq.temporal+' && '+der.temporal
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' && '+der.temporal+';\n'
+                v=izq.temporal+' && '+der.temporal
+                
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.caracter:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = '+izq.temporal+' && '+t+';\n'
+                v=izq.temporal+' && '+der.temporal
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.Doble:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' && '+der.temporal+';\n'
+                v=izq.temporal+' && '+der.temporal
+                
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' && '+der.temporal+';\n'
+                v=izq.temporal+' && '+der.temporal
+                # ----------------------------------------------------------------------------------------------------
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.caracter:
+            if der.tipo.tipo==tipoPrimitivo.caracter:
+
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                t3=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = (int) '+izq.temporal+';\n'+t3+' = '+t+' && '+t2+';\n'
+                v=izq.temporal+' && '+der.temporal
+
+
+                return nodoC3d(t3,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
+                c+=t2+' = '+der.temporal+' && '+t+';\n'
+                v=izq.temporal+' && '+der.temporal
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        if der.tipo.tipo == tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:        
+            estat.Lerrores.append(CError('Semantico','Error en &&',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'&&'+der.temporal+';\n'
+        v=izq.temporal+' && '+der.temporal
+
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newOr:
     def __init__(self,izq,der,c,l,n):
@@ -260,28 +725,89 @@ class newOr:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 or or PRIMITIVO2 </td><td> EXP= newOr(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 or or EXP2 </td><td> EXP= newOr(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
         izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                if(int(izq.valor)!=0):
-                    izq=1
-                else:
-                    izq=0
-                if(int(der.valor)!=0):
-                    der=1
-                else:
-                    der=0
-                return primitivo(tipoPrimitivo.Entero,izq or der,self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar Or',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        if izq.tipo.tipo==tipoPrimitivo.Entero:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' || '+der.temporal+';\n'
+                v=izq.temporal+' || '+der.temporal
 
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' || '+der.temporal+';\n'
+                v=izq.temporal+' || '+der.temporal
+                
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.caracter:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = '+izq.temporal+' || '+t+';\n'
+                v=izq.temporal+' || '+der.temporal
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.Doble:
+            if der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' || '+der.temporal+';\n'
+                v=izq.temporal+' || '+der.temporal
+                
+
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Doble:
+                t=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' || '+der.temporal+';\n'
+                v=izq.temporal+' || '+der.temporal
+                # ----------------------------------------------------------------------------------------------------
+                return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        elif izq.tipo.tipo==tipoPrimitivo.caracter:
+            if der.tipo.tipo==tipoPrimitivo.caracter:
+
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                t3=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                c+=t2+' = (int) '+izq.temporal+';\n'+t3+' = '+t+' || '+t2+';\n'
+                v=izq.temporal+' || '+der.temporal
+
+
+                return nodoC3d(t3,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+            elif der.tipo.tipo==tipoPrimitivo.Entero:
+                t=estat.newTemp()
+                t2=estat.newTemp()
+                c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
+                c+=t2+' = '+der.temporal+' || '+t+';\n'
+                v=izq.temporal+' || '+der.temporal
+
+                return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+        if der.tipo.tipo == tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:        
+            estat.Lerrores.append(CError('Semantico','Error en ||',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'||'+der.temporal+';\n'
+        v=izq.temporal+' || '+der.temporal
+
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+            
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newNot:
     def __init__(self,der,c,l,n):
@@ -291,20 +817,21 @@ class newNot:
         self.vNodo.hijos.append(nodoAST('!',n+1))
         self.vNodo.hijos.append(der.vNodo)
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= !PRIMITIVO </td><td> EXP= newNot(PRIMITIVO);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= !EXP </td><td> EXP= newNot(EXP);  </td></tr>'
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
         der=self.hijoDer.getvalor(entorno,estat)
-        if der.tipo==tipoPrimitivo.Entero:
-            if(int(der.valor)!=0):
-                der=1
-            else:
-                der=0
-            return primitivo(tipoPrimitivo.Entero,int(not der),self.columna,self.linea,0)
-        else:
-            estat.Lerrores.append(CError('Semantico','Error al realizar Xor',self.columna,self.linea))
-            return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        if der.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en !',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=der.c3d+'\n'+t+' = !'+der.temporal+';\n'
+        v='!'+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newEqual:
     def __init__(self,izq,der,c,l,n):
@@ -315,45 +842,24 @@ class newEqual:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 == PRIMITIVO2 </td><td> EXP= newEqual(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 == EXP2 </td><td> EXP= newEqual(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Entero,int(int(izq.valor)==int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Entero,int(int(izq.valor)==float(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Cadena:
-                if str(der.valor).lstrip('-').replace('.','',1).isdigit():
-                    return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)==float(der.valor)),self.columna,self.linea,0)
-                else:
-                    return primitivo(tipoPrimitivo.Entero,0,self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)==int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)==float(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Cadena:
-                if str(der.valor).lstrip('-').replace('.','',1).isdigit():
-                    return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)==float(der.valor)),self.columna,self.linea,0)
-                else:
-                    return primitivo(tipoPrimitivo.Entero,0,self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Cadena:
-            if der.tipo==tipoPrimitivo.Cadena:
-                return primitivo(tipoPrimitivo.Entero,int(str(izq.valor)==str(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Entero or der.tipo==tipoPrimitivo.Doble:
-                if str(izq.valor).lstrip('-').replace('.','',1).isdigit():
-                    return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)==float(der.valor)),self.columna,self.linea,0)
-                return primitivo(tipoPrimitivo.Entero,0,self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en ==',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'=='+der.temporal+';\n'
+        v=izq.temporal+'=='+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar la Igualacion',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
-
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
+     
 class newNotEqual:
     def __init__(self,izq,der,c,l,n):
         self.columna=c
@@ -363,45 +869,23 @@ class newNotEqual:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 != PRIMITIVO2 </td><td> EXP= newNotEqual(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 != EXP2 </td><td> EXP= newNotEqual(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Entero,int(int(izq.valor)!=int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Entero,int(int(izq.valor)!=float(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Cadena:
-                if str(der.valor).lstrip('-').replace('.','',1).isdigit():
-                    return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)!=float(der.valor)),self.columna,self.linea,0)
-                else:
-                    return primitivo(tipoPrimitivo.Entero,1,self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero:
-                return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)!=int(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)!=float(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Cadena:
-                if str(der.valor).lstrip('-').replace('.','',1).isdigit():
-                    return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)!=float(der.valor)),self.columna,self.linea,0)
-                else:
-                    return primitivo(tipoPrimitivo.Entero,1,self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Cadena:
-            if der.tipo==tipoPrimitivo.Cadena:
-                return primitivo(tipoPrimitivo.Entero,int(str(izq.valor)!=str(der.valor)),self.columna,self.linea,0)
-            elif der.tipo==tipoPrimitivo.Entero or der.tipo==tipoPrimitivo.Doble:
-                if str(izq.valor).lstrip('-').replace('.','',1).isdigit():
-                    return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)!=float(der.valor)),self.columna,self.linea,0)
-                return primitivo(tipoPrimitivo.Entero,1,self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en !=',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'!='+der.temporal+';\n'
+        v=izq.temporal+'!='+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar la Diferencia',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
-
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newMenorq:
     def __init__(self,izq,der,c,l,n):
@@ -412,19 +896,23 @@ class newMenorq:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 menorQue PRIMITIVO2 </td><td> EXP= newMenorq(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 menorQue EXP2 </td><td> EXP= newMenorq(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero or izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero or der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)<float(der.valor)),self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en menor que',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'<'+der.temporal+';\n'
+        v=izq.temporal+'<'+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
-        estat.Lerrores.append(CError('Semantico','Error al realizar Menor Que',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newMayorq:
     def __init__(self,izq,der,c,l,n):
@@ -435,19 +923,23 @@ class newMayorq:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 mayorQue PRIMITIVO2 </td><td> EXP= newMayorq(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 mayorQue EXP2 </td><td> EXP= newMayorq(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero or izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero or der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)>float(der.valor)),self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en mayor que',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'>'+der.temporal+';\n'
+        v=izq.temporal+'>'+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
-        estat.Lerrores.append(CError('Semantico','Error al realizar Mayor Que',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newMenorIgualq:
     def __init__(self,izq,der,c,l,n):
@@ -458,19 +950,23 @@ class newMenorIgualq:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 menorIgualQue PRIMITIVO2 </td><td> EXP= newMenorIgualq(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 menorIgualQue EXP2 </td><td> EXP= newMenorIgualq(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero or izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero or der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)<=float(der.valor)),self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en Menor Igual',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'<='+der.temporal+';\n'
+        v=izq.temporal+'<='+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
-        estat.Lerrores.append(CError('Semantico','Error al realizar Menor igual Que',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newMayorIgualq:
     def __init__(self,izq,der,c,l,n):
@@ -481,19 +977,23 @@ class newMayorIgualq:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 mayorIgualQue PRIMITIVO2 </td><td> EXP= newMayorIgualq(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 mayorIgualQue EXP2 </td><td> EXP= newMayorIgualq(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero or izq.tipo==tipoPrimitivo.Doble:
-            if der.tipo==tipoPrimitivo.Entero or der.tipo==tipoPrimitivo.Doble:
-                return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)>=float(der.valor)),self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en Mayor Igual',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'>='+der.temporal+';\n'
+        v=izq.temporal+'>='+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
-        estat.Lerrores.append(CError('Semantico','Error al realizar Mayor Igual Que',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 
 class newAndBtb:
@@ -505,31 +1005,23 @@ class newAndBtb:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 and PRIMITIVO2 </td><td> EXP= newAndBtb(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 and EXP2 </td><td> EXP= newAndBtb(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                bizq=bin(int(izq.valor)).replace("b","").replace('-','')
-                bder=bin(int(der.valor)).replace("b","").replace('-','')
-                while(len(bizq)<len(bder)):
-                    bizq='0'+bizq
-                while(len(bder)<len(bizq)):
-                    bder='0'+bder
-                res='0'
-                pos=0
-                while pos<len(bizq):
-                    res+=str(int(bizq[pos]) and int(bder[pos]))
-                    pos+=1
-                
-                return primitivo(tipoPrimitivo.Entero,int(res,2),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar And bit a bit',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en &',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'&'+der.temporal+';\n'
+        v=izq.temporal+'&'+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newOrBtb:
     def __init__(self,izq,der,c,l,n):
@@ -540,31 +1032,23 @@ class newOrBtb:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 or PRIMITIVO2 </td><td> EXP= newOrBtb(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 or EXP2 </td><td> EXP= newOrBtb(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                bizq=bin(int(izq.valor)).replace("b","").replace('-','')
-                bder=bin(int(der.valor)).replace("b","").replace('-','')
-                while(len(bizq)<len(bder)):
-                    bizq='0'+bizq
-                while(len(bder)<len(bizq)):
-                    bder='0'+bder
-                res='0'
-                pos=0
-                while pos<len(bizq):
-                    res+=str(int(bizq[pos]) or int(bder[pos]))
-                    pos+=1
-                
-                return primitivo(tipoPrimitivo.Entero,int(res,2),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar OR bit a bit',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en |',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+' | '+der.temporal+';\n'
+        v=izq.temporal+' | '+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newXorBtb:
     def __init__(self,izq,der,c,l,n):
@@ -575,31 +1059,23 @@ class newXorBtb:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 ^ PRIMITIVO2 </td><td> EXP= newXorBtb(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 ^ EXP2 </td><td> EXP= newXorBtb(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                bizq=bin(int(izq.valor)).replace("b","").replace('-','')
-                bder=bin(int(der.valor)).replace("b","").replace('-','')
-                while(len(bizq)<len(bder)):
-                    bizq='0'+bizq
-                while(len(bder)<len(bizq)):
-                    bder='0'+bder
-                res='0'
-                pos=0
-                while pos<len(bizq):
-                    res+=str(int(bizq[pos]) ^ int(bder[pos]))
-                    pos+=1
-                
-                return primitivo(tipoPrimitivo.Entero,int(res,2),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar XOR bit a bit',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en ^',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'^'+der.temporal+';\n'
+        v=izq.temporal+'^'+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newNotBtb:
     def __init__(self,izq,c,l,n):
@@ -608,23 +1084,21 @@ class newNotBtb:
         self.vNodo=nodoAST('~',n)
         self.vNodo.hijos.append(izq.vNodo)
         self.hijoIzq=izq
-        self.gramm='\n<tr><td>EXP::= ~ PRIMITIVO </td><td> EXP= newNotBtb(PRIMITIVO);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= ~ EXP1 </td><td> EXP= newNotBtb(EXP1);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
 
     def getvalor(self,entorno,estat):
         izq=self.hijoIzq.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            bizq=bin(int(izq.valor)).replace("b","").replace('-','')
-            res='0'
-            pos=1
-            while pos<len(bizq):
-                res+=str(int(not int(bizq[pos])))
-                pos+=1    
-            return primitivo(tipoPrimitivo.Entero,int(res,2),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar Not bit a bit',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        if izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en ~ ',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+t+' = ~'+izq.temporal+';\n'
+        v='~'+izq.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newDespIzqBtb:
     def __init__(self,izq,der,c,l,n):
@@ -635,29 +1109,23 @@ class newDespIzqBtb:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 despIzq PRIMITIVO2 </td><td> EXP= newDespIzqBtb(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 despIzq EXP2 </td><td> EXP= newDespIzqBtb(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                bizq=bin(int(izq.valor)).replace("b","").replace('-','')
-                pos=int(der.valor)
-                if pos<0:
-                    estat.Lerrores.append(CError('Semantico','Error al realizar XOR bit a bit',self.columna,self.linea))
-                    return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en Desplazo izq',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'<<'+der.temporal+';\n'
+        v=izq.temporal+' << '+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
-                res=str(bizq)
-                for i in range(pos):
-                    res+='0'
-
-                return primitivo(tipoPrimitivo.Entero,int(res,2),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar Desplazamiento izquierdo bit a bit',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newDespDerBtb:
     def __init__(self,izq,der,c,l,n):
@@ -668,30 +1136,24 @@ class newDespDerBtb:
         self.vNodo.hijos.append(der.vNodo)
         self.hijoIzq=izq
         self.hijoDer=der
-        self.gramm='\n<tr><td>EXP::= PRIMITIVO1 despDer PRIMITIVO2 </td><td> EXP= newDespDerBtb(PRIMITIVO1,PRIMITIVO2);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= EXP1 despDer EXP2 </td><td> EXP= newDespDerBtb(EXP1,EXP2);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
         self.gramm+='\n'+str(der.gramm)
 
+    
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
         der=self.hijoDer.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            if der.tipo==tipoPrimitivo.Entero:
-                bizq=bin(int(izq.valor)).replace("b","").replace('-','')
-                pos=0
-                cond=len(bizq)-int(der.valor)
-                if cond<=0:
-                    res='0'
-                else:
-                    res=''
-                    while pos<cond:
-                        res+=str(int(bizq[pos]))
-                        pos+=1
-                
-                return primitivo(tipoPrimitivo.Entero,int(res,2),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar Desplazamiento derecha bit a bit',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        izq=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en Desplazamiento derecho',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=izq.c3d+'\n'+der.c3d+'\n'+t+' ='+izq.temporal+'>>'+der.temporal+';\n'
+        v=izq.temporal+'>>'+der.temporal
+        return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 
 class newNegacion:
@@ -701,18 +1163,23 @@ class newNegacion:
         self.vNodo=nodoAST('-',n)
         self.vNodo.hijos.append(v.vNodo)
         self.exp=v
-        self.gramm='\n<tr><td>EXP::= - PRIMITIVO  </td><td> EXP= newNegacion(PRIMITIVO);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= - EXP  </td><td> EXP= newNegacion(EXP);  </td></tr>'
         self.gramm+='\n'+str(v.gramm)
 
+    
     def getvalor(self,entorno,estat):
-        temp=self.exp.getvalor(entorno,estat)
-        if temp.tipo==tipoPrimitivo.Entero:
-            return primitivo(tipoPrimitivo.Entero,int(int(temp.valor)*-1),self.columna,self.linea,0)
-        elif temp.tipo==tipoPrimitivo.Doble:
-            return primitivo(tipoPrimitivo.Doble,float(float(temp.valor)*-1),self.columna,self.linea,0)
-        
-        estat.Lerrores.append(CError('Semantico','Error al realizar Negacion numerica',self.columna,self.linea))
-        return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0) 
+        der=self.exp.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en -exp',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=der.c3d+'\n'+t+' = -'+der.temporal+';\n'
+        v='-'+der.temporal
+        return nodoC3d(t,der.tipo,c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
+
 
 class newPuntero:
     def __init__(self,v,c,l,n):
@@ -723,22 +1190,23 @@ class newPuntero:
         self.vNodo.hijos.append(v.vNodo)
         self.exp=v
         self.tipo=tipoPrimitivo.puntero
-        self.gramm='\n<tr><td>EXP::= and PRIMITIVO  </td><td> EXP= newPuntero(PRIMITIVO);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= and EXP1  </td><td> EXP= newPuntero(EXP1);  </td></tr>'
         self.gramm+='\n'+str(v.gramm)
 
+
     def getvalor(self,entorno,estat):
-        if(isinstance(self.exp,id_)):
-            temp=entorno.buscar(self.exp.variable,self.columna,self.linea,estat)
-            if temp!=None:
-                return temp.valor
-            else:
-                return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
-        else:
-            t=self.exp.getvalor(entorno,estat)
-            if t.tipo==tipoPrimitivo.Error:
-                return t
-            return self.exp
-            
+        der=self.exp.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en &exp',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=der.c3d+'\n'+t+' = &'+der.temporal+';\n'
+        v='-'+der.temporal
+        return nodoC3d(t,der.tipo,c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
+
 
 class newCasteoInt:
     def __init__(self,izq,c,l,n):
@@ -750,26 +1218,21 @@ class newCasteoInt:
         self.vNodo.hijos.append(nodoAST('(',n+3))
         self.vNodo.hijos.append(izq.vNodo)
         self.hijoIzq=izq
-        self.gramm='\n<tr><td>EXP::= (int) PRIMITIVO  </td><td> EXP= newCasteoInt(PRIMITIVO);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= (int) EXP1  </td><td> EXP= newCasteoInt(EXP1);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Doble:
-            return primitivo(tipoPrimitivo.Entero,int(float(izq.valor)),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Cadena:
-            return primitivo(tipoPrimitivo.Entero,ord(str(izq.valor)[0]),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Arreglo:
-            if len(izq.arreglo)==0:
-                estat.Lerrores.append(CError('Semantico','Error al realizar casteo a Int',self.columna,self.linea))
-                return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        der=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en (int)exp',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=der.c3d+'\n'+t+' = (int)'+der.temporal+';\n'
+        v='(int)'+der.temporal
+        return nodoC3d(t,der.tipo,c,[],[],v)
 
-            return newCasteoInt(izq.arreglo[list(izq.arreglo.keys())[0]],self.columna,self.linea,0).getvalor(entorno,estat)
-        else:
-            estat.Lerrores.append(CError('Semantico','Error al realizar casteo a Int',self.columna,self.linea))
-            return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newCasteoFloat:
     def __init__(self,izq,c,l,n):
@@ -781,26 +1244,21 @@ class newCasteoFloat:
         self.vNodo.hijos.append(nodoAST('(',n+3))
         self.vNodo.hijos.append(izq.vNodo)
         self.hijoIzq=izq
-        self.gramm='\n<tr><td>EXP::= (float) PRIMITIVO  </td><td> EXP= newCasteoFloat(PRIMITIVO);  </td></tr>'
+        self.gramm='\n<tr><td>EXP::= (float) EXP  </td><td> EXP= newCasteoFloat(EXP);  </td></tr>'
         self.gramm+='\n'+str(izq.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero:
-            return primitivo(tipoPrimitivo.Entero,float(izq.valor),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Doble:
-            return primitivo(tipoPrimitivo.Entero,float(izq.valor),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Cadena:
-            return primitivo(tipoPrimitivo.Entero,float(ord(str(izq.valor)[0])),self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Arreglo:
-            if len(izq.arreglo)==0:
-                estat.Lerrores.append(CError('Semantico','Error al realizar casteo a Float',self.columna,self.linea))
-                return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
-                
-            return newCasteoFloat(izq.arreglo[list(izq.arreglo.keys())[0]],self.columna,self.linea,0).getvalor(entorno,estat)
-        else:
-            estat.Lerrores.append(CError('Semantico','Error al realizar casteo a Float',self.columna,self.linea))
-            return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        der=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en (float)exp',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=der.c3d+'\n'+t+' = (float)'+der.temporal+';\n'
+        v='(float)'+der.temporal
+        return nodoC3d(t,der.tipo,c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newCasteoChar:
     def __init__(self,izq,c,l,n):
@@ -816,23 +1274,17 @@ class newCasteoChar:
         self.gramm+='\n'+str(izq.gramm)
 
     def getvalor(self,entorno,estat):
-        izq=self.hijoIzq.getvalor(entorno,estat)
-        if izq.tipo==tipoPrimitivo.Entero or izq.tipo==tipoPrimitivo.Doble:
-            temp=int(float(izq.valor))
-            if(temp>255):
-                temp=temp%256            
-            return primitivo(tipoPrimitivo.Cadena,chr(int(temp)),self.columna,self.linea,0)        
-        elif izq.tipo==tipoPrimitivo.Cadena:
-            return primitivo(tipoPrimitivo.Cadena,str(izq.valor)[0],self.columna,self.linea,0)
-        elif izq.tipo==tipoPrimitivo.Arreglo:
-            if len(izq.arreglo)==0:
-                estat.Lerrores.append(CError('Semantico','Error al realizar casteo a Char',self.columna,self.linea))
-                return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
-                
-            return newCasteoChar(izq.arreglo[list(izq.arreglo.keys())[0]],self.columna,self.linea,0).getvalor(entorno,estat)
-        else:
-            estat.Lerrores.append(CError('Semantico','Error al realizar casteo a Char',self.columna,self.linea))
-            return primitivo(tipoPrimitivo.Error,'@error@',self.columna,self.linea,0)
+        der=self.hijoIzq.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en (char)exp',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        t=estat.newTemp()
+        c=der.c3d+'\n'+t+' = (char)'+der.temporal+';\n'
+        v='(char)'+der.temporal
+        return nodoC3d(t,der.tipo,c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
         
 class newArreglo:
@@ -848,8 +1300,22 @@ class newArreglo:
             self.gramm+=i.gramm
         
     def getvalor(self,entorno,estat):
-        # actualizar valor en caso se imprima arreglo
-        return self
+        t=estat.newTemp()
+        c='\n'+t+'= array();\n'
+        v='Array()'
+        n=0
+        for i in self.arreglo:
+            e=i.getvalor(entorno,estat)
+            if e.tipo.tipo==tipoPrimitivo.Error:
+                estat.Lerrores.append(CError('Semantico','Error al crear el arreglo',self.columna,self.linea))
+                return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+            c+=i.c3d+'\n'+t+'['+str(n)+']'+'='+i.temporal+';\n'
+            n+=1 
+        return nodoC3d(t,newtipo(tipoPrimitivo.Arreglo,''),c,[],[],v)
+
+    
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
                 
 
 
@@ -869,8 +1335,20 @@ class newAccesoArr:
 
 
     def getvalor(self,entorno,estat):
-        return
+        izq=self.variable.getvalor(entorno,estat)
+        i=self.indice.getvalor(entorno,estat)
+        if i.tipo.tipo==tipoPrimitivo.Error or izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error al realizar acceso',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+        
+        t=izq.temporal+'['+i.temporal+']'
+        c=izq.c3d+'\n'+i.c3d+'\n'
+        v=t
+        return nodoC3d(t,newtipo(tipoPrimitivo.acceso,''),c,[],[],v)
+        
 
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 class newAccesoStr:
     def __init__(self,var,Li,c,l,n):
@@ -885,7 +1363,21 @@ class newAccesoStr:
         self.gramm+=var.gramm
 
     def getvalor(self,entorno,estat):
-        return
+        izq=self.variable.getvalor(entorno,estat)
+        i=self.indice
+        if izq.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error al realizar acceso',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+        
+        t=izq.temporal+'['+i+']'
+        c=izq.c3d+'\n'
+        v=t
+        return nodoC3d(t,newtipo(tipoPrimitivo.acceso,''),c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
+
+
 
 class newIncremento:
     def __init__(self,var,t,c,l,n):
@@ -898,8 +1390,23 @@ class newIncremento:
         self.gramm='\n<tr><td>EXP::= ID ++ </td><td> EXP= newIncremento(ID);  </td></tr>'
 
     def getvalor(self,entorno,estat):
-        return
+        der=self.variable.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en ++exp',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        if self.tinc==1:
+            c=der.c3d+'\n'+der.temporal+' ='+der.temporal+'+1;\n'
+            v='++'+der.temporal
+            return nodoC3d(der.temporal,der.tipo,c,[],[],v)
+        else:
+            t=estat.newTemp()
+            c=der.c3d+'\n'+t+' ='+der.temporal+';\n'
+            c+=der.temporal+' ='+der.temporal+'+1;\n'
+            v='++'+der.temporal
+            return nodoC3d(t,der.tipo,c,[],[],v)
 
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
     
 class newDecremento:
     def __init__(self,var,t,c,l,n):
@@ -912,7 +1419,23 @@ class newDecremento:
         self.gramm='\n<tr><td>EXP::= ID -- </td><td> EXP= newDecremento(ID);  </td></tr>'
 
     def getvalor(self,entorno,estat):
-        return
+        der=self.variable.getvalor(entorno,estat)
+        if der.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error en --exp',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')            
+        if self.tdec==1:
+            c=der.c3d+'\n'+der.temporal+' ='+der.temporal+'-1;\n'
+            v='--'+der.temporal
+            return nodoC3d(der.temporal,der.tipo,c,[],[],v)
+        else:
+            t=estat.newTemp()
+            c=der.c3d+'\n'+t+' ='+der.temporal+';\n'
+            c+=der.temporal+' ='+der.temporal+'-1;\n'
+            v='--'+der.temporal
+            return nodoC3d(t,der.tipo,c,[],[],v)
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 
 class newTernaria:
@@ -929,7 +1452,30 @@ class newTernaria:
         self.gramm='\n<tr><td>EXP::= EXP1 ? EXP2 : EXP3  </td><td> EXP= newTernaria(EXP1,EXP2,EXP3);  </td></tr>'
 
     def getvalor(self,entorno,estat):
-        return
+        e1=self.exp1.getvalor(entorno,estat)
+        e2=self.exp2.getvalor(entorno,estat)
+        e3=self.exp3.getvalor(entorno,estat)
+
+        if e1.tipo.tipo==tipoPrimitivo.Error or e2.tipo.tipo==tipoPrimitivo.Error or e3.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','Error al realizar acceso',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')         
+
+        t=estat.newTemp()
+        l1=estat.newetiquetaL()
+        c=e1.c3d+'\n'+e2.c3d+'\n'+e3.c3d
+        c+='\n'+t+'='+e2.temporal+';'
+        c+='\nif('+e1.temporal+') goto '+l1+';'
+        c+='\n'+t+'='+e3.temporal+';'
+        c+='\n'+l1+':\n'
+
+        v=e1.temporal+'?'+e2.temporal+':'+e3.temporal
+
+        return nodoC3d(t,newtipo(tipoPrimitivo.acceso,''),c,[],[],v)
+        
+        
+
+    def ejecutar(self,entorno,estat):
+        return self.getvalor(entorno,estat)
 
 
 

@@ -1,0 +1,14 @@
+digraph Q { 
+  node [shape=record];
+node0[label="LABEL"];
+p_inicio ->node0;
+node1[label="main"];
+node0 -> node1;
+node2[label="LABEL"];
+p_inicio ->node2;
+node3[label="return"];
+node2 -> node3;
+node4[label="exit"];
+p_inicio ->node4;
+
+}

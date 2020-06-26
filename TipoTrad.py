@@ -33,7 +33,7 @@ class nodoAST:
 
 class nodoC3d:
     def __init__(self,term,t,codigo,salid,contin,val):
-        self.terminal=term
+        self.temporal=term
         self.tipo=t
         self.c3d=codigo
         self.EtiquetasdeSalida=salid

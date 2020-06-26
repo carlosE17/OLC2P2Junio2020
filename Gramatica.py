@@ -691,25 +691,25 @@ def p_expresion_casteo(t):
 def p_exp_entero(t):
     'exp : ENTERO'
     global noNodo
-    t[0] = primitivo(tipoPrimitivo.Entero,t[1],t.lexpos(1),t.lineno(1),noNodo)
+    t[0] = primitivo(newtipo(tipoPrimitivo.Entero,''),t[1],t.lexpos(1),t.lineno(1),noNodo)
     noNodo+=1
 
 def p_exp_decimal(t):
     'exp : DECIMAL'
     global noNodo
-    t[0] = primitivo(tipoPrimitivo.Doble,t[1],t.lexpos(1),t.lineno(1),noNodo)
+    t[0] = primitivo(newtipo(tipoPrimitivo.Doble,''),t[1],t.lexpos(1),t.lineno(1),noNodo)
     noNodo+=1
 
 def p_exp_cadena(t):
     'exp : CADENA'
     global noNodo
-    t[0] = primitivo(tipoPrimitivo.Cadena,t[1],t.lexpos(1),t.lineno(1),noNodo)
+    t[0] = primitivo(newtipo(tipoPrimitivo.Cadena,''),t[1],t.lexpos(1),t.lineno(1),noNodo)
     noNodo+=1
 
 def p_exp_caracter(t):
     'exp : CARACTER'
     global noNodo
-    t[0] = primitivo(tipoPrimitivo.caracter,t[1],t.lexpos(1),t.lineno(1),noNodo)
+    t[0] = primitivo(newtipo(tipoPrimitivo.caracter,''),t[1],t.lexpos(1),t.lineno(1),noNodo)
     noNodo+=1
 
 def p_exp_id(t):
@@ -790,6 +790,10 @@ parser = yacc.yacc()
 
 
 def parse(input) :
+    global lexer
+    global parser
+    lexer=lex.lex()
+    parser=yacc.yacc()
     return parser.parse(input)
 
 def getLerr():

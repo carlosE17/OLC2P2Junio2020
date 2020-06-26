@@ -61,7 +61,7 @@ def traducir(Linstr,c,Le,tabs):
     tabs.add(editor, text=t0, padding=10)
     rutas.append(t0+'.txt')
 
-    # correrAugus(c3dOptimizado,c)
+    correrAugus(c3dOptimizado,c)
 
     c3dPAraDebug=c3dOptimizado
 
@@ -108,7 +108,7 @@ def gReporteTsTraduccion(L):
     texto='digraph {\n'
     t=''
     for k,v in L:
-        t+="<tr> <td> " + str(k) + "</td><td> " + str(v.tipo.name) + " </td><td> " + v.temporal + " </td><td> " + v.valor + " </td><td> "+ v.linea + "</td> </tr>"
+        t+="<tr> <td> " + str(k) + "</td><td> " + str(v.tipo.tipo.name) + " </td><td> " + v.temporal + " </td><td> " + v.valor + " </td><td> "+ v.linea + "</td> </tr>"
 
     texto += "node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>ID</td><td>Tipo</td><td>Temporal</td><td>valor</td><td>Linea</td></tr>\n"+ t+ "    </table>\n" + ">];}"
     with open('reporteTs_minorC.dot', "w") as f:
@@ -152,6 +152,7 @@ def gramRepoTraduccion(L):
 def correrAugus(texto,salida):
     agus.resetLerr()
     agus.resetNonodo()
+    # print(texto)
     resultado=agus.parse(texto)
 
     salida.delete('1.0', END)

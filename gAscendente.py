@@ -382,6 +382,8 @@ parser = yacc.yacc()
 
 
 def parse(input) :
+    lex.lex()
+    yacc.yacc()
     return parser.parse(input)
 
 def getLerr():
