@@ -1304,14 +1304,20 @@ class newArreglo:
         c='\n'+t+'= array();\n'
         v='Array()'
         n=0
+        prof=0
         for i in self.arreglo:
             e=i.getvalor(entorno,estat)
             if e.tipo.tipo==tipoPrimitivo.Error:
                 estat.Lerrores.append(CError('Semantico','Error al crear el arreglo',self.columna,self.linea))
                 return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
             c+=i.c3d+'\n'+t+'['+str(n)+']'+'='+i.temporal+';\n'
+            if n==0:
+                prof=e.profundidad
             n+=1 
-        return nodoC3d(t,newtipo(tipoPrimitivo.Arreglo,''),c,[],[],v)
+        f=nodoC3d(t,newtipo(tipoPrimitivo.Arreglo,''),c,[],[],v)
+        if len(self.arreglo)>0:
+            f.profundidad+=prof
+        return f
 
     
     def ejecutar(self,entorno,estat):

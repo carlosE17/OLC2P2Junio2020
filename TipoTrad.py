@@ -38,6 +38,7 @@ class nodoC3d:
         self.c3d=codigo
         self.EtiquetasdeSalida=salid
         self.EtiquetasContinue=contin
+        self.EtiquetasBreak=[]
         self.valor=val
         self.profundidad=0
 

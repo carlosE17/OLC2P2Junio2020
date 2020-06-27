@@ -2,6 +2,7 @@ from TipoTrad import *
 from CError import CError
 from Simbolo_Trad import Simbolo
 from tkinter import *
+from Entorno_Trad import Entorno
 
 
 class newDecStruct:
@@ -19,7 +20,8 @@ class newDecStruct:
             self.gramm+=i.gramm
     
     def ejecutar(self,entorno,estat):
-        return
+        estat.structs[self.nombre]=self.propiedades
+        return nodoC3d('',newtipo(tipoPrimitivo.structura,''),'',[],[],self.nombre)
 
 class newDecParam:
     def __init__(self,t,name,arr,c,l,n):

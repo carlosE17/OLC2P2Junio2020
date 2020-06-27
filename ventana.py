@@ -33,7 +33,7 @@ def traducir(Linstr,c,Le,tabs):
     ast=AST_C3d.Estaticos(LErr)
     entornoG=Entorno_C3d.Entorno(None)
     c3dPerFuncion={}
-    c3dVarGlobales=''
+    c3dVarGlobales='$s0=array();\n$s1=array();\n$sp=-1;\n$ra=-1;\n'
     try:
         i=0
         while i<len(Linstr):
@@ -60,6 +60,8 @@ def traducir(Linstr,c,Le,tabs):
     editor.insert(INSERT,c3dOptimizado )
     tabs.add(editor, text=t0, padding=10)
     rutas.append(t0+'.txt')
+
+    print(c3dOptimizado)
 
     correrAugus(c3dOptimizado,c)
 
