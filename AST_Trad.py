@@ -40,4 +40,4 @@ class Estaticos:
     
     def newetiquetaL(self):
         self.nL+=1
-        return "L"+str(self.nL)+":"
+        return "L"+str(self.nL)

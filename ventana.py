@@ -7,7 +7,7 @@ import AST_Trad as AST_C3d
 import Entorno_Trad as Entorno_C3d
 import TipoTrad as tipo_C3d
 from graphviz import Source
-
+import Instruccion_Trad as InstrminorC
 import gAscendente as agus
 import Gramatica as g1
 from CError import CError
@@ -37,7 +37,11 @@ def traducir(Linstr,c,Le,tabs):
     try:
         i=0
         while i<len(Linstr):
-            Linstr[i].ejecutar(entornoG,ast)
+            cTemp=Linstr[i].ejecutar(entornoG,ast)
+            if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
+                c3dVarGlobales+=cTemp.c3d+''
+            elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
+                c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
             i+=1
     except Exception as e:
         print('veentana[33]'+str(e))

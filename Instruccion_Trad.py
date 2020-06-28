@@ -64,7 +64,7 @@ class newDecFuncion:
             self.vNodo.hijos[3].hijos.append(i.vNodo)
     
     def ejecutar(self,entorno,estat):
-        return
+        return nodoC3d('',self.tipo,'',[],[],'')
 
 class newDecla:
     def __init__(self,name,dim,e,c,l,n):
@@ -83,7 +83,7 @@ class newDecla:
             self.vNodo.hijos.append(nodoAST('=',n+3))
             self.vNodo.hijos.append(e.vNodo)
             self.gramm+=e.gramm
-        if not( isinstance(dim,int) or isinstance(dim,list)):
+        if dim!='':
             self.gramm+='\n<tr><td>INDICES::= INDICES1 [ EXP ] : </td><td> INDICES=INDICES1; INDICES.append(EXP);  </td></tr>'
             self.gramm+='\n<tr><td>INDICES::= [EXP] : </td><td> INDICES=[]; INDICES.append(EXP);  </td></tr>'    
             for i in dim:
@@ -106,7 +106,41 @@ class newDeclaracion:
             self.gramm+=i.gramm
 
     def ejecutar(self,entorno,estat):
-        return
+
+        predVal='0'
+        c=''
+        if self.tipo.tipo==tipoPrimitivo.Doble: predVal='0.0'
+        elif self.tipo.tipo==tipoPrimitivo.caracter: predVal='\' \''
+        elif self.tipo.tipo==tipoPrimitivo.structura:
+            if self.tipo.v in estat.structs:
+                predVal='array()'
+            else:
+                estat.Lerrores.append(CError('Semantico','Error no se ha declarado el struct\''+self.tipo.v+'\'',self.columna,self.linea))
+                return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+        elif self.tipo.tipo==tipoPrimitivo.void:
+            estat.Lerrores.append(CError('Semantico','Error no se pueden declarar variables tipo void',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+
+        for i in self.declaraciones:
+            v=predVal
+            var=i.nombre
+            t=estat.newTemp()
+            tip=self.tipo
+            if i.dimensiones!='':v='array()'
+            if i.exp!='':
+                temp=i.exp.getvalor(entorno,estat)
+                if temp.tipo.tipo==tipoPrimitivo.Error:
+                    estat.Lerrores.append(CError('Semantico','Error no se puede asignar un error',self.columna,self.linea))
+                    continue
+
+                v=temp.temporal
+                c+=temp.c3d+'\n'
+                tip=temp.tipo
+            c+=t+' = '+v+';\n'
+            entorno.insertar(var,Simbolo(tip,v,t,self.linea),self.columna,self.linea,estat)
+
+
+        return nodoC3d('',self.tipo,c,[],[],'')
 
 
 
@@ -123,7 +157,7 @@ class newEtiqueta:
         self.gramm+='\n<tr><td>LABEL::= '+str(v)+' : </td><td> LABEL='+str(v)+';  </td></tr>'
     
     def ejecutar(self,entorno,estat):
-        return
+        return nodoC3d('',self.tipo,self.label_+':\n',[],[],'')
 
 class newSalto:
     def __init__(self,v,c,l,n):
@@ -138,7 +172,7 @@ class newSalto:
         self.gramm+='\n<tr><td>LABEL::= '+str(v)+' : </td><td> LABEL='+str(v)+';  </td></tr>'
 
     def ejecutar(self,entorno,estat):
-       return
+       return nodoC3d('',self.tipo,'goto '+self.label_+';\n',[],[],'')
 
 class newAsignacion:
     def __init__(self,id,Li,v,tig,c,l,n):
@@ -156,14 +190,47 @@ class newAsignacion:
         self.gramm+='\n<tr><td>INDICES::= INDICES1 [ EXP ] : </td><td> INDICES=INDICES1; INDICES.append(EXP);  </td></tr>'
         self.gramm+='\n<tr><td>INDICES::= [EXP] : </td><td> INDICES=[]; INDICES.append(EXP);  </td></tr>'
         for i in Li:
-            self.vNodo.hijos[1].hijos.append(i.vNodo)
-            self.gramm+=str(i.gramm)
-        self.vNodo.hijos.append(nodoAST(str(tig),n+3))
+            if not isinstance(i,str):
+                self.vNodo.hijos[1].hijos.append(i.vNodo)
+                self.gramm+=str(i.gramm)
+        self.vNodo.hijos.append(nodoAST(str('='),n+3))
         self.vNodo.hijos.append(v.vNodo)
         self.gramm+=str(v.gramm)
 
     def ejecutar(self,entorno,estat):
-        return
+        t=entorno.buscar(self.id,self.columna,self.linea,estat)
+        if t==None:
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+        tempo=t.temporal
+        c=''
+        for i in self.accesos:
+            if isinstance(i,str):
+                tempo+='[\''+i+'\']'
+            else:
+                tmp=i.getvalor(entorno,estat)
+                if tmp.tipo.tipo!=tipoPrimitivo.Error:
+                    tempo+='['+tmp.temporal+']'
+                    c+=tmp.c3d+'\n'
+        resultado=self.valor.getvalor(entorno,estat)
+        if resultado.tipo.tipo==tipoPrimitivo.Error:
+            estat.Lerrores.append(CError('Semantico','No se puede asignar un error',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+        c+=resultado.c3d+'\n'
+        if self.operand=='=': c+=tempo+' = '+resultado.temporal+';\n'
+        elif self.operand=='+=': c+=tempo+' = '+tempo+' + '+resultado.temporal+';\n'
+        elif self.operand=='-=': c+=tempo+' = '+tempo+' - '+resultado.temporal+';\n'
+        elif self.operand=='*=': c+=tempo+' = '+tempo+' * '+resultado.temporal+';\n'
+        elif self.operand=='/=': c+=tempo+' = '+tempo+' / '+resultado.temporal+';\n'
+        elif self.operand=='%=': c+=tempo+' = '+tempo+' % '+resultado.temporal+';\n'
+        elif self.operand=='<<=': c+=tempo+' = '+tempo+' << '+resultado.temporal+';\n'
+        elif self.operand=='>>=': c+=tempo+' = '+tempo+' >> '+resultado.temporal+';\n'
+        elif self.operand=='&=': c+=tempo+' = '+tempo+' & '+resultado.temporal+';\n'
+        elif self.operand=='|=': c+=tempo+' = '+tempo+' | '+resultado.temporal+';\n'
+        elif self.operand=='^=': c+=tempo+' = '+tempo+' ^ '+resultado.temporal+';\n'
+
+
+
+        return nodoC3d('',resultado.tipo,c,[],[],'')
 
 class newLlamadaInstr:
     def __init__(self,id,p,c,l,n):
@@ -202,7 +269,30 @@ class newIF:
             self.vNodo.hijos.append(nodoAST('else',n+1)) 
 
     def ejecutar(self,entorno,estat):
-        return
+        c=''
+        salidas=[]
+        breaks=[]
+        continues=[]
+        for i in self.subifs:
+            actual=Entorno(entorno)
+            sub=i.ejecutar(actual,estat)
+            c+=sub.c3d
+            salidas=salidas+sub.EtiquetasdeSalida
+            breaks=breaks+sub.EtiquetasBreak
+            continues=continues+sub.EtiquetasContinue
+        actual=Entorno(entorno)
+        for i in self.else_:
+            temp=i.ejecutar(actual,estat)
+            breaks=breaks+temp.EtiquetasBreak
+            continues=continues+temp.EtiquetasContinue
+            c+=temp.c3d
+        for i in salidas:
+            c+=i+':\n'
+
+        nodoResultante=nodoC3d('',newtipo(tipoPrimitivo.void,''),c,[],continues,'')
+        nodoResultante.EtiquetasBreak=breaks
+
+        return nodoResultante
 
 class newSubIF:
     def __init__(self,cond,instr,c,l,n):
@@ -219,7 +309,28 @@ class newSubIF:
             self.gramm+=i.gramm
 # etiquetas de salida, etiqueta de break y continue
     def ejecutar(self,entorno,estat):
-        return
+        c=''
+        resultado=self.condicion.getvalor(entorno,estat)
+        if resultado.tipo.tipo==tipoPrimitivo.Error: 
+            return nodoC3d('',resultado.tipo,'',[],[],'')
+        L1=estat.newetiquetaL()
+        L2=estat.newetiquetaL()
+        L3=estat.newetiquetaL()
+        breaks=[]
+        continues=[]
+        c+=resultado.c3d+'\n'
+        c+='if('+resultado.temporal+') goto '+L1+';\n goto '+L2+';\n'+L1+':\n'
+        for i in self.Linstr:
+            temp=i.ejecutar(entorno,estat)
+            breaks=breaks+temp.EtiquetasBreak
+            continues=continues+temp.EtiquetasContinue
+            c+=temp.c3d
+        c+='goto '+L3+';\n'+L2+':\n'
+
+        nodoResultante=nodoC3d('',resultado.tipo,c,[L3],continues,'')
+        nodoResultante.EtiquetasBreak=breaks
+
+        return nodoResultante
         
 
 class newWhile:
@@ -237,7 +348,37 @@ class newWhile:
             self.gramm+=i.gramm
 
     def ejecutar(self,entorno,estat):
-        return
+        cond=self.condicion.getvalor(entorno,estat)
+        if cond.tipo.tipo==tipoPrimitivo.Error:
+            return nodoC3d('',cond.tipo,'',[],[],'')
+
+        c=''
+        inwhile=''
+        breaks=[]
+        continues=[]
+        Evaluar=estat.newetiquetaL()
+        inicio=estat.newetiquetaL()
+        salir=estat.newetiquetaL()
+        actual=Entorno(entorno)
+        for i in self.Linstr:
+            temp=i.ejecutar(actual,estat)
+            inwhile+=temp.c3d
+            breaks=breaks+temp.EtiquetasBreak
+            continues=continues+temp.EtiquetasContinue
+
+        c+=Evaluar+':\n'
+        
+        for i in continues:
+            c+=i+':\n'
+        c+=cond.c3d
+        c+='if ('+cond.temporal+') goto '+inicio+';\ngoto '+salir+';\n'+inicio+':\n'
+        c+=inwhile
+        c+='goto '+Evaluar+';\n'
+        c+=salir+':\n'
+        for i in breaks:
+            c+=i+':\n'
+
+        return nodoC3d('',cond.tipo,c,[],[],'')
 
 class newDo:
     def __init__(self,cond,instr,c,l,n):
@@ -254,7 +395,40 @@ class newDo:
             self.gramm+=i.gramm
 
     def ejecutar(self,entorno,estat):
-        return
+        cond=self.condicion.getvalor(entorno,estat)
+        if cond.tipo.tipo==tipoPrimitivo.Error:
+            return nodoC3d('',cond.tipo,'',[],[],'')
+
+        c=''
+        inwhile=''
+        breaks=[]
+        continues=[]
+        Evaluar=estat.newetiquetaL()
+        inicio=estat.newetiquetaL()
+        salir=estat.newetiquetaL()
+        actual=Entorno(entorno)
+        for i in self.Linstr:
+            temp=i.ejecutar(actual,estat)
+            inwhile+=temp.c3d
+            breaks=breaks+temp.EtiquetasBreak
+            continues=continues+temp.EtiquetasContinue
+
+        
+        c+='goto '+inicio+';\n'
+        c+=Evaluar+':\n'
+        
+        for i in continues:
+            c+=i+':\n'
+        c+=cond.c3d
+        c+='if ('+cond.temporal+') goto '+inicio+';\ngoto '+salir+';\n'+inicio+':\n'
+        c+=inwhile
+        c+='goto '+Evaluar+';\n'
+        c+=salir+':\n'
+        for i in breaks:
+            c+=i+':\n'
+
+        return nodoC3d('',cond.tipo,c,[],[],'')
+
 
 class newFor:
     def __init__(self,i1,cond,i2,instr,c,l,n):
@@ -277,7 +451,44 @@ class newFor:
             self.gramm+=i.gramm
         
     def ejecutar(self,entorno,estat):
-        return
+        cond=self.condicion.getvalor(entorno,estat)
+        if cond.tipo.tipo==tipoPrimitivo.Error:
+            return nodoC3d('',cond.tipo,'',[],[],'')
+
+        c=''
+        inwhile=''
+        breaks=[]
+        continues=[]
+        Evaluar=estat.newetiquetaL()
+        incremento=estat.newetiquetaL()
+        inicio=estat.newetiquetaL()
+        salir=estat.newetiquetaL()
+        actual=Entorno(entorno)
+        for1=self.ins1.ejecutar(actual,estat)
+        for3=self.ins2.ejecutar(actual,estat)
+
+        for i in self.Linstr:
+            temp=i.ejecutar(actual,estat)
+            inwhile+=temp.c3d
+            breaks=breaks+temp.EtiquetasBreak
+            continues=continues+temp.EtiquetasContinue
+
+        c+=for1.c3d
+        c+='goto '+Evaluar+';'
+        c+=incremento+':\n'
+        for i in continues:
+            c+=i+':\n'
+        c+=for3.c3d
+        c+=Evaluar+':\n'
+        c+=cond.c3d
+        c+='if ('+cond.temporal+') goto '+inicio+';\ngoto '+salir+';\n'+inicio+':\n'
+        c+=inwhile
+        c+='goto '+incremento+';\n'
+        c+=salir+':\n'
+        for i in breaks:
+            c+=i+':\n'
+
+        return nodoC3d('',cond.tipo,c,[],[],'')
 
 
 class newSwitch:
@@ -341,7 +552,10 @@ class newBreak:
         self.gramm='<tr><td>INSTRUCCION::= BREAK;  </td><td> INSTRUCCION=newBreak(); </td></tr>'
     
     def ejecutar(self,entorno,estat):
-        return
+        t=estat.newetiquetaL()
+        v=nodoC3d('',newtipo(tipoPrimitivo.void,''),'goto '+t+';\n',[],[],'')
+        v.EtiquetasBreak.append(t)
+        return v
 
 
 class newContinue:
@@ -352,7 +566,8 @@ class newContinue:
         self.gramm='<tr><td>INSTRUCCION::= CONTINUE;  </td><td> INSTRUCCION=newContinue(); </td></tr>'
     
     def ejecutar(self,entorno,estat):
-        return
+        t=estat.newetiquetaL()
+        return nodoC3d('',newtipo(tipoPrimitivo.void,''),'goto '+t+';\n',[],[t],'')
         
 
         
