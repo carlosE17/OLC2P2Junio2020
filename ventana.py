@@ -33,7 +33,18 @@ def traducir(Linstr,c,Le,tabs):
     ast=AST_C3d.Estaticos(LErr)
     entornoG=Entorno_C3d.Entorno(None)
     c3dPerFuncion={}
-    c3dVarGlobales='$s0=array();\n$s1=array();\n$sp=-1;\n$ra=-1;\n'
+    c3dVarGlobales='$s0=array();\n$s1=array();\n$sp=-1;\n$ra=-1;\n$s1[$ra]=0;\n'
+
+
+    try:
+        i=0
+        while i<len(Linstr):
+            if isinstance(Linstr[i],InstrminorC.newDecFuncion):
+                ast.addFun(Linstr[i].nombre,Linstr[i])                    
+            i+=1
+    except Exception as e:
+        print('veentana[46]'+str(e))
+
     try:
         i=0
         while i<len(Linstr):
@@ -44,14 +55,23 @@ def traducir(Linstr,c,Le,tabs):
                 c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
             i+=1
     except Exception as e:
-        print('veentana[33]'+str(e))
+        print('veentana[58]'+str(e))
+
+    # i=0
+    # while i<len(Linstr):
+    #     cTemp=Linstr[i].ejecutar(entornoG,ast)
+    #     if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
+    #         c3dVarGlobales+=cTemp.c3d+''
+    #     elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
+    #         c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
+    #     i+=1
     
     c3dOptimizado='main:\n'+c3dVarGlobales+'\n'
-    for k,v in c3dPerFuncion:
+    for k,v in c3dPerFuncion.items():
         if k.lower()=='main': c3dOptimizado+=v+'\n'
     c3dOptimizado+='return:\n'+ast.retornos+'\nexit; \n'
 
-    for k,v in c3dPerFuncion:
+    for k,v in c3dPerFuncion.items():
         if k.lower()!='main': c3dOptimizado+=k+':\n'+v+'\n'
     
 

@@ -37,8 +37,434 @@ node0 [    shape=plaintext
 <tr><td>EXP::= - PRIMITIVO  </td><td> EXP= newNegacion(PRIMITIVO);  </td></tr>
 
 <tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s1 : </td><td> VARIABLE=$s1;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $ra </td><td> ID= id_($ra);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= 0 </td><td> PRIMITIVO= primitivo(0);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= 0 </td><td> PRIMITIVO= primitivo(0);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t4 : </td><td> VARIABLE=$t4;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $sp : </td><td> VARIABLE=$sp;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t6 : </td><td> VARIABLE=$t6;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t6 </td><td> ID= id_($t6);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= 5 </td><td> PRIMITIVO= primitivo(5);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t6 : </td><td> VARIABLE=$t6;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t6 </td><td> ID= id_($t6);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $ra : </td><td> VARIABLE=$ra;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $ra </td><td> ID= id_($ra);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s1 : </td><td> VARIABLE=$s1;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $ra </td><td> ID= id_($ra);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= 2 </td><td> PRIMITIVO= primitivo(2);  </td></tr>
+<tr><td>INSTRUCCION::= GOTO LABEL ; </td><td> INSTRUCCION=newSalto(LABEL); </td></tr>
+<tr><td>LABEL::= suma : </td><td> LABEL=suma;  </td></tr>
+<tr><td>INSTRUCCION::= LABEL : </td><td> INSTRUCCION=newEtiqueta(LABEL); </td></tr>
+<tr><td>LABEL::= L1 : </td><td> LABEL=L1;  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $ra : </td><td> VARIABLE=$ra;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 - PRIMITIVO2 </td><td> EXP= newResta(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $ra </td><td> ID= id_($ra);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t8 : </td><td> VARIABLE=$t8;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= VARIABLE INDICES </td><td> EXP= newAcceso(VARIABLE,INDICES);  </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $sp : </td><td> VARIABLE=$sp;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 - PRIMITIVO2 </td><td> EXP= newResta(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t5 : </td><td> VARIABLE=$t5;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t8 </td><td> ID= id_($t8);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t9 : </td><td> VARIABLE=$t9;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= (int) PRIMITIVO  </td><td> EXP= newCasteoInt(PRIMITIVO);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t5 </td><td> ID= id_($t5);  </td></tr>
+<tr><td>INSTRUCCION::= PRINT (PRIMITIVO); </td><td> INSTRUCCION=newImprimir(PRIMITIVO); </td></tr>
+<tr><td>PRIMITIVO::= \n </td><td> PRIMITIVO= primitivo(\n);  </td></tr>
+<tr><td>INSTRUCCION::= PRINT (PRIMITIVO); </td><td> INSTRUCCION=newImprimir(PRIMITIVO); </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t9 </td><td> ID= id_($t9);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $sp : </td><td> VARIABLE=$sp;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t5 </td><td> ID= id_($t5);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $sp : </td><td> VARIABLE=$sp;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t10 : </td><td> VARIABLE=$t10;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t10 </td><td> ID= id_($t10);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t5 </td><td> ID= id_($t5);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t10 : </td><td> VARIABLE=$t10;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t10 </td><td> ID= id_($t10);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $ra : </td><td> VARIABLE=$ra;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $ra </td><td> ID= id_($ra);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s1 : </td><td> VARIABLE=$s1;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $ra </td><td> ID= id_($ra);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= 3 </td><td> PRIMITIVO= primitivo(3);  </td></tr>
+<tr><td>INSTRUCCION::= GOTO LABEL ; </td><td> INSTRUCCION=newSalto(LABEL); </td></tr>
+<tr><td>LABEL::= suma : </td><td> LABEL=suma;  </td></tr>
+<tr><td>INSTRUCCION::= LABEL : </td><td> INSTRUCCION=newEtiqueta(LABEL); </td></tr>
+<tr><td>LABEL::= L2 : </td><td> LABEL=L2;  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $ra : </td><td> VARIABLE=$ra;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 - PRIMITIVO2 </td><td> EXP= newResta(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $ra </td><td> ID= id_($ra);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t12 : </td><td> VARIABLE=$t12;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= VARIABLE INDICES </td><td> EXP= newAcceso(VARIABLE,INDICES);  </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $sp : </td><td> VARIABLE=$sp;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 - PRIMITIVO2 </td><td> EXP= newResta(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t5 : </td><td> VARIABLE=$t5;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= VARIABLE INDICES </td><td> EXP= newAcceso(VARIABLE,INDICES);  </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $sp : </td><td> VARIABLE=$sp;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 - PRIMITIVO2 </td><td> EXP= newResta(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t5 : </td><td> VARIABLE=$t5;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t12 </td><td> ID= id_($t12);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t13 : </td><td> VARIABLE=$t13;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= (int) PRIMITIVO  </td><td> EXP= newCasteoInt(PRIMITIVO);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t5 </td><td> ID= id_($t5);  </td></tr>
+<tr><td>INSTRUCCION::= PRINT (PRIMITIVO); </td><td> INSTRUCCION=newImprimir(PRIMITIVO); </td></tr>
+<tr><td>PRIMITIVO::=  </td><td> PRIMITIVO= primitivo();  </td></tr>
+<tr><td>INSTRUCCION::= PRINT (PRIMITIVO); </td><td> INSTRUCCION=newImprimir(PRIMITIVO); </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t13 </td><td> ID= id_($t13);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= 0 </td><td> PRIMITIVO= primitivo(0);  </td></tr>
+<tr><td>INSTRUCCION::= GOTO LABEL ; </td><td> INSTRUCCION=newSalto(LABEL); </td></tr>
+<tr><td>LABEL::= return : </td><td> LABEL=return;  </td></tr>
+<tr><td>INSTRUCCION::= GOTO LABEL ; </td><td> INSTRUCCION=newSalto(LABEL); </td></tr>
+<tr><td>LABEL::= return : </td><td> LABEL=return;  </td></tr>
 <tr><td>INSTRUCCION::= LABEL : </td><td> INSTRUCCION=newEtiqueta(LABEL); </td></tr>
 <tr><td>LABEL::= return : </td><td> LABEL=return;  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t7 : </td><td> VARIABLE=$t7;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 == PRIMITIVO2 </td><td> EXP= newEqual(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>EXP::= VARIABLE INDICES </td><td> EXP= newAcceso(VARIABLE,INDICES);  </td></tr>
+<tr><td>VARIABLE::= $s1 : </td><td> VARIABLE=$s1;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $ra </td><td> ID= id_($ra);  </td></tr>
+
+<tr><td>PRIMITIVO::= 2 </td><td> PRIMITIVO= primitivo(2);  </td></tr>
+<tr><td>INSTRUCCION::= IF(EXP) GOTO LABEL ; </td><td> INSTRUCCION=newIF(EXP,LABEL); </td></tr>
+<tr><td>LABEL::= L1 : </td><td> LABEL=L1;  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t7 </td><td> ID= id_($t7);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t11 : </td><td> VARIABLE=$t11;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 == PRIMITIVO2 </td><td> EXP= newEqual(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>EXP::= VARIABLE INDICES </td><td> EXP= newAcceso(VARIABLE,INDICES);  </td></tr>
+<tr><td>VARIABLE::= $s1 : </td><td> VARIABLE=$s1;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $ra </td><td> ID= id_($ra);  </td></tr>
+
+<tr><td>PRIMITIVO::= 3 </td><td> PRIMITIVO= primitivo(3);  </td></tr>
+<tr><td>INSTRUCCION::= IF(EXP) GOTO LABEL ; </td><td> INSTRUCCION=newIF(EXP,LABEL); </td></tr>
+<tr><td>LABEL::= L2 : </td><td> LABEL=L2;  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t11 </td><td> ID= id_($t11);  </td></tr>
 <tr><td>INSTRUCCION::= EXIT ; </td><td> INSTRUCCION=newSalir(); </td></tr>
+<tr><td>INSTRUCCION::= LABEL : </td><td> INSTRUCCION=newEtiqueta(LABEL); </td></tr>
+<tr><td>LABEL::= suma : </td><td> LABEL=suma;  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= 0 </td><td> PRIMITIVO= primitivo(0);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t1 : </td><td> VARIABLE=$t1;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t2 : </td><td> VARIABLE=$t2;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= VARIABLE INDICES </td><td> EXP= newAcceso(VARIABLE,INDICES);  </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t1 </td><td> ID= id_($t1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t1 : </td><td> VARIABLE=$t1;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t1 </td><td> ID= id_($t1);  </td></tr>
+
+<tr><td>PRIMITIVO::= 1 </td><td> PRIMITIVO= primitivo(1);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $t3 : </td><td> VARIABLE=$t3;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>EXP::= PRIMITIVO1 + PRIMITIVO2 </td><td> EXP= newSuma(PRIMITIVO1,PRIMITIVO2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t2 </td><td> ID= id_($t2);  </td></tr>
+
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t2 </td><td> ID= id_($t2);  </td></tr>
+<tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
+<tr><td>VARIABLE::= $s0 : </td><td> VARIABLE=$s0;  </td></tr>
+<tr><td>INDICES::= INDICES1 [ PRIMITIVO ] : </td><td> INDICES=INDICES1; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>INDICES::= [PRIMITIVO] : </td><td> INDICES=[]; INDICES.append(PRIMITIVO);  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $sp </td><td> ID= id_($sp);  </td></tr>
+<tr><td>EXP::= PRIMITIVO : </td><td> EXP= PRIMITIVO;  </td></tr>
+<tr><td>PRIMITIVO::= ID </td><td> PRIMITIVO= ID;  </td></tr>
+<tr><td>ID::= $t3 </td><td> ID= id_($t3);  </td></tr>
+<tr><td>INSTRUCCION::= GOTO LABEL ; </td><td> INSTRUCCION=newSalto(LABEL); </td></tr>
+<tr><td>LABEL::= return : </td><td> LABEL=return;  </td></tr>
+<tr><td>INSTRUCCION::= GOTO LABEL ; </td><td> INSTRUCCION=newSalto(LABEL); </td></tr>
+<tr><td>LABEL::= return : </td><td> LABEL=return;  </td></tr>
     </table>
 >];}

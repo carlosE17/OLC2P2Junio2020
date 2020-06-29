@@ -41,3 +41,7 @@ class Estaticos:
     def newetiquetaL(self):
         self.nL+=1
         return "L"+str(self.nL)
+
+    def getRa(self):
+        self.ra+=1
+        return str(self.ra)

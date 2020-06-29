@@ -12,7 +12,7 @@ class primitivo:
         self.tipo=t
         self.gramm='\n<tr><td>EXP::= '+str(v)+' </td><td> EXP= primitivo('+str(v)+');  </td></tr>'
     def getvalor(self,entorno,estat):
-        v=self.valor
+        v=str(self.valor)
         if self.tipo.tipo==tipoPrimitivo.Cadena or self.tipo.tipo==tipoPrimitivo.caracter: v='\"'+v+"\""
         return nodoC3d(v,self.tipo,'',[],[],self.valor)
 

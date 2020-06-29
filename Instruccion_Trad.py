@@ -3,6 +3,7 @@ from CError import CError
 from Simbolo_Trad import Simbolo
 from tkinter import *
 from Entorno_Trad import Entorno
+from Expresion_Trad import newEqual
 
 
 class newDecStruct:
@@ -64,7 +65,32 @@ class newDecFuncion:
             self.vNodo.hijos[3].hijos.append(i.vNodo)
     
     def ejecutar(self,entorno,estat):
-        return nodoC3d('',self.tipo,'',[],[],'')
+        actual=Entorno(entorno)
+        c='$s0[$sp]=0;\n'
+        t1=estat.newTemp()
+        c+=t1+'=$sp+1;\n'
+        for p in self.parametros:
+            t=estat.newTemp()
+            c+=t+'='+'$s0['+t1+'];\n'
+            actual.insertar(p.nombre,Simbolo(p.tipo,'---',t,self.linea),self.columna,self.linea,estat)
+            c+=t1+'='+t1+'+1;\n'
+        
+        breaks=[]
+        continues=[]
+        for i in self.Linstrucciones:
+            temp=i.ejecutar(actual,estat)
+            c+=temp.c3d
+            breaks=breaks+temp.EtiquetasBreak
+            continues=continues+temp.EtiquetasContinue
+
+        if len(breaks)>0 or len(continues)>0:
+            estat.Lerrores.append(CError('Semantico','Error se encontro un break o continue fuera de un ciclo',self.columna,self.linea))
+        
+        c+='goto return;\n'
+
+
+
+        return nodoC3d('',self.tipo,c,[],[],'')
 
 class newDecla:
     def __init__(self,name,dim,e,c,l,n):
@@ -246,7 +272,102 @@ class newLlamadaInstr:
             self.vNodo.hijos[1].hijos.append(i.vNodo)
         
     def getvalor(self,entorno,estat):
-        return self
+
+        if self.nombre.lower()=='scanf':
+            if len(self.parametros)>0:
+                estat.Lerrores.append(CError('Semantico','No se esperaban parametros en la funcion nativa scanf',self.columna,self.linea))
+            tt=estat.newTemp()
+            return nodoC3d(tt,newtipo(tipoPrimitivo.void,''),tt+'=read();',[],[],'')
+        elif self.nombre.lower()=='printf':
+            cod=''
+            if len(self.parametros)>1:
+                casteos=[]
+                texto=self.parametros[0].getvalor(entorno,estat)
+                if texto.tipo.tipo==tipoPrimitivo.Cadena:
+                    casteos=texto.valor.split("%")
+                contando=1
+                cantcast=0
+                paraimp=[]
+                for i in casteos:
+                    if i!='':paraimp.append(i)
+
+                while contando<len(self.parametros):
+                    p=self.parametros[contando].getvalor(entorno,estat)
+                    if len(paraimp)>0:
+                        if paraimp[cantcast][0].lower()=='d' or paraimp[cantcast][0].lower()=='i':
+                            tt=estat.newTemp()
+                            cod+=p.c3d
+                            cod+=tt+'=(int)'+p.temporal+';\n'
+                            cod+='print(\''+paraimp[cantcast][1:]+'\');\n'
+                            cod+='print('+tt+');\n'
+                        elif paraimp[cantcast][0].lower()=='c':
+                            tt=estat.newTemp()
+                            cod+=p.c3d
+                            cod+=tt+'=(char)'+p.temporal+';\n'
+                            cod+='print(\''+paraimp[cantcast][1:]+'\');\n'
+                            cod+='print('+tt+');\n'
+                        elif paraimp[cantcast][0].lower()=='f':
+                            tt=estat.newTemp()
+                            cod+=p.c3d
+                            cod+=tt+'=(float)'+p.temporal+';\n'
+                            cod+='print(\''+paraimp[cantcast][1:]+'\');\n'
+                            cod+='print('+tt+');\n'
+                        else:
+                            cod+=p.c3d
+                            cod+='print(\''+paraimp[cantcast]+'\');\n'
+                            cod+='print('+p.temporal+');\n'
+                        cantcast+=1
+                    else:
+                        cod+=p.c3d
+                        cod+='print('+p.temporal+');\n'
+                    contando+=1
+            elif len(self.parametros)==1:
+                p=self.parametros[0].getvalor(entorno,estat)
+                cod+=p.c3d
+                cod+='print('+p.temporal+');\n'
+            
+            return nodoC3d('print(\'@error@\')',newtipo(tipoPrimitivo.void,''),cod,[],[],'')
+            
+
+        if not (self.nombre in estat.C3dFunciones):
+            estat.Lerrores.append(CError('Semantico','Error no se encontro la funcion \''+self.nombre+'\'',self.columna,self.linea))
+            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+
+
+        c='$sp=$sp+1;\n'
+        tempoEntActual=[]
+        for k,v in entorno.tabla.items():
+            c+='$s0[$sp]='+v.temporal+';\n'
+            c+='$sp=$sp+1;\n'
+            tempoEntActual.append(v.temporal)
+        
+        t=estat.newTemp()
+        c+=t+'=$sp+1;\n'
+        for p in self.parametros:
+            temp=p.ejecutar(entorno,estat)
+            c+=temp.c3d
+            c+='$s0['+t+']='+temp.temporal+';\n'
+            c+=t+'='+t+'+1;\n'
+
+        contador=estat.getRa()
+        etiquetaRetorno=estat.newetiquetaL()
+        c+='$ra=$ra+1;\n$s1[$ra]='+contador+';\n'
+        tcond=estat.newTemp()
+        estat.retornos+=tcond+'=$s1[$ra]=='+contador+';\n'+'if('+tcond+') goto '+etiquetaRetorno+';\n'
+        c+='goto '+self.nombre+';\n'+etiquetaRetorno+':\n'
+        c+='$ra=$ra-1;\n'
+        aDevolver=estat.newTemp()
+        c+=aDevolver+'=$s0[$sp];\n'
+        i=len(tempoEntActual)-1
+        while i>=0:
+            c+='$sp=$sp-1;\n'
+            c+=tempoEntActual[i]+'=$s0[$sp];\n'
+            i-=1
+        
+        c+='$sp=$sp-1;\n'
+        
+
+        return nodoC3d(aDevolver,newtipo(tipoPrimitivo.void,''),c,[],[],'')
 
     def ejecutar(self,entorno,estat):
         return self.getvalor(entorno,estat)
@@ -506,7 +627,48 @@ class newSwitch:
             self.gramm+=i.gramm
         
     def ejecutar(self,entorno,estat):
-        return
+        actual=Entorno(entorno)
+        c3dDefault=''
+        Ldef=estat.newetiquetaL()
+        breaks=[]
+        continues=[]
+        igualdades=[]
+        etiquetas=[]
+        casos=[]
+
+        for i in self.casos:
+            if i.esDefault:
+                temp=i.ejecutar(actual,estat)
+                c3dDefault+=temp.c3d
+                breaks=breaks+temp.EtiquetasBreak
+                continues=continues+temp.EtiquetasContinue
+                break
+        
+        for i in self.casos:
+            if not i.esDefault:
+                temp=i.ejecutar(actual,estat)
+                casos.append(temp.c3d)
+                breaks=breaks+temp.EtiquetasBreak
+                continues=continues+temp.EtiquetasContinue
+                etiquetas.append(estat.newetiquetaL())
+                igualdades.append(newEqual(self.condicion,i.valor,self.columna,self.linea,0).getvalor(actual,estat))
+        
+        c1=''
+        c2=''
+
+        i=0
+        while i<len(casos):
+            c1+=igualdades[i].c3d+'if('+igualdades[i].temporal+') goto '+etiquetas[i]+';\n'
+            c2+=etiquetas[i]+':\n'+casos[i]
+            i+=1
+
+
+        c=c1+'goto '+Ldef+';\n'+c2+Ldef+':\n'+c3dDefault
+
+        for i in breaks:
+            c+=i+':\n'
+
+        return nodoC3d('',newtipo(tipoPrimitivo.void,''),c,[],continues,'')
 
 class newCaso:
     def __init__(self,val,instr,esdef,c,l,n):
@@ -528,7 +690,19 @@ class newCaso:
             self.gramm+=i.gramm
     
     def ejecutar(self,entorno,estat):
-        return
+        breaks=[]
+        continues=[]
+        c=''
+        for i in self.Linstr:
+            temp=i.ejecutar(entorno,estat)
+            c+=temp.c3d
+            breaks=breaks+temp.EtiquetasBreak
+            continues=continues+temp.EtiquetasContinue
+        
+        nodoResultante=nodoC3d('',newtipo(tipoPrimitivo.void,''),c,[],continues,'')
+        nodoResultante.EtiquetasBreak=breaks
+        
+        return nodoResultante
 
 class newRetorno:
     def __init__(self,v,c,l,n):
@@ -542,7 +716,13 @@ class newRetorno:
             self.gramm+=v.gramm
     
     def ejecutar(self,entorno,estat):
-        return
+        c=''
+        if self.valor!='':
+            t=self.valor.getvalor(entorno,estat)
+            c+=t.c3d
+            c+='$s0[$sp]='+t.temporal+';\n'
+        c+='goto return;\n'
+        return nodoC3d('',newtipo(tipoPrimitivo.void,''),c,[],[],'')
 
 class newBreak:
     def __init__(self,c,l,n):
