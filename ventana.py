@@ -85,7 +85,7 @@ def traducir(Linstr,c,Le,tabs):
     tabs.add(editor, text=t0, padding=10)
     rutas.append(t0+'.txt')
 
-    print(c3dOptimizado)
+    # print(c3dOptimizado)
 
     correrAugus(c3dOptimizado,c)
 

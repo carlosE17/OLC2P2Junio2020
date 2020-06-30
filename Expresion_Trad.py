@@ -8,12 +8,12 @@ class primitivo:
         self.columna=c
         self.linea=l
         self.vNodo=nodoAST(v,n)
-        self.valor=v
+        self.valor=str(v)
         self.tipo=t
         self.gramm='\n<tr><td>EXP::= '+str(v)+' </td><td> EXP= primitivo('+str(v)+');  </td></tr>'
     def getvalor(self,entorno,estat):
         v=str(self.valor)
-        if self.tipo.tipo==tipoPrimitivo.Cadena or self.tipo.tipo==tipoPrimitivo.caracter: v='\"'+v+"\""
+        if self.tipo.tipo==tipoPrimitivo.Cadena or self.tipo.tipo==tipoPrimitivo.caracter: v='\"'+v.replace('\\n','\\\\n').replace('\\t','\\\\t')+"\""
         return nodoC3d(v,self.tipo,'',[],[],self.valor)
 
     def ejecutar(self,entorno,estat):
@@ -60,7 +60,7 @@ class newSuma:
                 t=estat.newTemp()
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' + '+der.temporal+';\n'
                 v=izq.temporal+' + '+der.temporal
-                
+                # print('c:\n'+c+'\n'+'der:\n'+str(der.valor)+'\n''type:\n'+str(type(der.valor))+'\n')
                 if der.valor=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal

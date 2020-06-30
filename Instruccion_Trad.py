@@ -163,6 +163,7 @@ class newDeclaracion:
                 c+=temp.c3d+'\n'
                 tip=temp.tipo
             c+=t+' = '+v+';\n'
+            # print(self.linea)
             entorno.insertar(var,Simbolo(tip,v,t,self.linea),self.columna,self.linea,estat)
 
 
@@ -287,51 +288,57 @@ class newLlamadaInstr:
                     casteos=texto.valor.split("%")
                 contando=1
                 cantcast=0
-                paraimp=[]
-                for i in casteos:
-                    if i!='':paraimp.append(i)
 
-                while contando<len(self.parametros):
+                while cantcast<len(casteos):
                     p=self.parametros[contando].getvalor(entorno,estat)
-                    if len(paraimp)>0:
-                        if paraimp[cantcast][0].lower()=='d' or paraimp[cantcast][0].lower()=='i':
-                            tt=estat.newTemp()
-                            cod+=p.c3d
-                            cod+=tt+'=(int)'+p.temporal+';\n'
-                            cod+='print(\''+paraimp[cantcast][1:]+'\');\n'
-                            cod+='print('+tt+');\n'
-                        elif paraimp[cantcast][0].lower()=='c':
-                            tt=estat.newTemp()
-                            cod+=p.c3d
-                            cod+=tt+'=(char)'+p.temporal+';\n'
-                            cod+='print(\''+paraimp[cantcast][1:]+'\');\n'
-                            cod+='print('+tt+');\n'
-                        elif paraimp[cantcast][0].lower()=='f':
-                            tt=estat.newTemp()
-                            cod+=p.c3d
-                            cod+=tt+'=(float)'+p.temporal+';\n'
-                            cod+='print(\''+paraimp[cantcast][1:]+'\');\n'
-                            cod+='print('+tt+');\n'
-                        else:
-                            cod+=p.c3d
-                            cod+='print(\''+paraimp[cantcast]+'\');\n'
-                            cod+='print('+p.temporal+');\n'
-                        cantcast+=1
-                    else:
+                    if cantcast==0:
+                        cod+='print(\''+casteos[cantcast]+'\');\n'
+                        contando-=1
+                    elif casteos[cantcast]=='':
+                        print('')
+                    elif casteos[cantcast][0].lower()=='d' or casteos[cantcast][0].lower()=='i':
+                        tt=estat.newTemp()
+                        cod+=p.c3d
+                        cod+=tt+'=(int)'+p.temporal+';\n'
+                        cod+='print('+tt+');\n'
+                        cod+='print(\''+casteos[cantcast][1:]+'\');\n'
+                        
+                    elif casteos[cantcast][0].lower()=='c':
+                        tt=estat.newTemp()
+                        cod+=p.c3d
+                        cod+=tt+'=(char)'+p.temporal+';\n'
+                        cod+='print('+tt+');\n'
+                        cod+='print(\''+casteos[cantcast][1:]+'\');\n'
+                        
+                    elif casteos[cantcast][0].lower()=='f':
+                        tt=estat.newTemp()
+                        cod+=p.c3d
+                        cod+=tt+'=(float)'+p.temporal+';\n'
+                        cod+='print('+tt+');\n'
+                        cod+='print(\''+casteos[cantcast][1:]+'\');\n'
+                        
+                    elif casteos[cantcast][0].lower()=='s':
                         cod+=p.c3d
                         cod+='print('+p.temporal+');\n'
+                        cod+='print(\''+casteos[cantcast][1:]+'\');\n'
+                        
+                    
+                    # verificar cantidades correctas de %
                     contando+=1
+                    if contando==len(self.parametros): contando=contando-1
+                    cantcast+=1
+
             elif len(self.parametros)==1:
                 p=self.parametros[0].getvalor(entorno,estat)
                 cod+=p.c3d
                 cod+='print('+p.temporal+');\n'
             
-            return nodoC3d('print(\'@error@\')',newtipo(tipoPrimitivo.void,''),cod,[],[],'')
+            return nodoC3d('0',newtipo(tipoPrimitivo.void,''),cod,[],[],'')
             
 
         if not (self.nombre in estat.C3dFunciones):
             estat.Lerrores.append(CError('Semantico','Error no se encontro la funcion \''+self.nombre+'\'',self.columna,self.linea))
-            return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+            return nodoC3d('0',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
 
 
         c='$sp=$sp+1;\n'

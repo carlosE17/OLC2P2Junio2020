@@ -10,6 +10,9 @@ node0 [    shape=plaintext
 <tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
 <tr><td>ID::= a  </td><td> ID=a;  </td></tr>
 <tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr>
+<tr><td>DECLARACION::= TIPO LDECLA ;  </td><td> PARAMETRO=newDeclaracion(TIPO,LDECLA); </td></tr><tr><td>LDECLA::= LDECLA DECLA ;  </td><td> LDECLA.append(DECLA); </td></tr><tr><td>DECLA::= ID POSC POSEXP </td><td> PARAMETRO=newDecla(ID, POSC, POSEXP); </td></tr>
+<tr><td>ID::= f  </td><td> ID=f;  </td></tr>
+<tr><td>EXP::= 5 </td><td> EXP= primitivo(5);  </td></tr>
 <tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
 <tr><td>ID::= main  </td><td> ID=main;  </td></tr>
 <tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr>

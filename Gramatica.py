@@ -369,7 +369,7 @@ def p_salto_instr(t) :
 def p_declaracion_instr(t) :
     'declaracion   : tipo ldecla_ PTCOMA'
     global noNodo
-    t[0]=newDeclaracion(t[1],t[2],t.lexpos(1),t.lineno(1),noNodo)
+    t[0]=newDeclaracion(t[1],t[2],t.lexpos(1),t.lineno(3),noNodo)
     noNodo+=3
 
 def p_Ldecla(t) :
