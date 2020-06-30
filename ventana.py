@@ -45,26 +45,26 @@ def traducir(Linstr,c,Le,tabs):
     except Exception as e:
         print('veentana[46]'+str(e))
 
-    try:
-        i=0
-        while i<len(Linstr):
-            cTemp=Linstr[i].ejecutar(entornoG,ast)
-            if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
-                c3dVarGlobales+=cTemp.c3d+''
-            elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
-                c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
-            i+=1
-    except Exception as e:
-        print('veentana[58]'+str(e))
+    # try:
+    #     i=0
+    #     while i<len(Linstr):
+    #         cTemp=Linstr[i].ejecutar(entornoG,ast)
+    #         if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
+    #             c3dVarGlobales+=cTemp.c3d+''
+    #         elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
+    #             c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
+    #         i+=1
+    # except Exception as e:
+    #     print('veentana[58]'+str(e))
 
-    # i=0
-    # while i<len(Linstr):
-    #     cTemp=Linstr[i].ejecutar(entornoG,ast)
-    #     if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
-    #         c3dVarGlobales+=cTemp.c3d+''
-    #     elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
-    #         c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
-    #     i+=1
+    i=0
+    while i<len(Linstr):
+        cTemp=Linstr[i].ejecutar(entornoG,ast)
+        if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
+            c3dVarGlobales+=cTemp.c3d+''
+        elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
+            c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
+        i+=1
     
     c3dOptimizado='main:\n'+c3dVarGlobales+'\n'
     for k,v in c3dPerFuncion.items():
@@ -87,12 +87,12 @@ def traducir(Linstr,c,Le,tabs):
 
     # print(c3dOptimizado)
 
-    correrAugus(c3dOptimizado,c)
+    # correrAugus(c3dOptimizado,c)
 
     c3dPAraDebug=c3dOptimizado
 
     gReporteErrTraduccion(ast.Lerrores)
-    gReporteTsTraduccion(entornoG.tabla.items())
+    gReporteTsTraduccion(entornoG.tabla.items(),ast.C3dFunciones.items())
     graphASTtraduccion(Linstr)
 
 def gReporteErrTraduccion(L):
@@ -130,11 +130,14 @@ def gReporteErrTraduccion(L):
         with open('reporteErroresSemanticos_minorC.dot', "w") as f:
                 f.write(t)
 
-def gReporteTsTraduccion(L):
+def gReporteTsTraduccion(L,L2):
     texto='digraph {\n'
     t=''
     for k,v in L:
         t+="<tr> <td> " + str(k) + "</td><td> " + str(v.tipo.tipo.name) + " </td><td> " + v.temporal + " </td><td> " + v.valor + " </td><td> "+ v.linea + "</td> </tr>"
+    for k,v in L2:
+        t+="<tr> <td> " + str(k) + "</td><td> " + 'funcion '+str(v.tipo.tipo.name) + " </td><td> " + '---' + " </td><td> " + '---' + " </td><td> "+str(v.linea)  + "</td> </tr>"
+
 
     texto += "node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>ID</td><td>Tipo</td><td>Temporal</td><td>valor</td><td>Linea</td></tr>\n"+ t+ "    </table>\n" + ">];}"
     with open('reporteTs_minorC.dot', "w") as f:

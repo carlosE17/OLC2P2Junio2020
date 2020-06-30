@@ -112,8 +112,9 @@ class newDecla:
         if dim!='':
             self.gramm+='\n<tr><td>INDICES::= INDICES1 [ EXP ] : </td><td> INDICES=INDICES1; INDICES.append(EXP);  </td></tr>'
             self.gramm+='\n<tr><td>INDICES::= [EXP] : </td><td> INDICES=[]; INDICES.append(EXP);  </td></tr>'    
-            for i in dim:
-                self.vNodo.hijos[1].hijos.append(i.vNodo)
+            if not isinstance(dim,int):
+                for i in dim:
+                    self.vNodo.hijos[1].hijos.append(i.vNodo)
     
     def ejecutar(self,entorno,estat):
         return
@@ -334,20 +335,27 @@ class newLlamadaInstr:
                 cod+='print('+p.temporal+');\n'
             
             return nodoC3d('0',newtipo(tipoPrimitivo.void,''),cod,[],[],'')
-            
+           
 
         if not (self.nombre in estat.C3dFunciones):
             estat.Lerrores.append(CError('Semantico','Error no se encontro la funcion \''+self.nombre+'\'',self.columna,self.linea))
             return nodoC3d('0',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+        else:
+            if len(estat.C3dFunciones[self.nombre].parametros)!=len(self.parametros):
+                estat.Lerrores.append(CError('Semantico','Error cantidad de parametros incorrecta en la funcion \''+self.nombre+'\'',self.columna,self.linea))
+                return nodoC3d('0',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
+
 
 
         c='$sp=$sp+1;\n'
         tempoEntActual=[]
-        for k,v in entorno.tabla.items():
+        ent=entorno
+        for k,v in ent.tabla.items():
             c+='$s0[$sp]='+v.temporal+';\n'
             c+='$sp=$sp+1;\n'
             tempoEntActual.append(v.temporal)
-        
+            # ------------------------------------------------------------
+        print(entorno.tabla.items())
         t=estat.newTemp()
         c+=t+'=$sp+1;\n'
         for p in self.parametros:
@@ -366,11 +374,12 @@ class newLlamadaInstr:
         aDevolver=estat.newTemp()
         c+=aDevolver+'=$s0[$sp];\n'
         i=len(tempoEntActual)-1
+        print('i-> '+str(i))
         while i>=0:
-            c+='$sp=$sp-1;\n'
+            c+='$sp=$sp-1;#----------------------------------------------\n'
             c+=tempoEntActual[i]+'=$s0[$sp];\n'
             i-=1
-        
+        # ----------------------------------------------------------------------
         c+='$sp=$sp-1;\n'
         
 
@@ -579,9 +588,7 @@ class newFor:
             self.gramm+=i.gramm
         
     def ejecutar(self,entorno,estat):
-        cond=self.condicion.getvalor(entorno,estat)
-        if cond.tipo.tipo==tipoPrimitivo.Error:
-            return nodoC3d('',cond.tipo,'',[],[],'')
+        
 
         c=''
         inwhile=''
@@ -592,7 +599,14 @@ class newFor:
         inicio=estat.newetiquetaL()
         salir=estat.newetiquetaL()
         actual=Entorno(entorno)
+        
+
         for1=self.ins1.ejecutar(actual,estat)
+
+        cond=self.condicion.getvalor(actual,estat)
+        if cond.tipo.tipo==tipoPrimitivo.Error:
+            return nodoC3d('',cond.tipo,'',[],[],'')
+
         for3=self.ins2.ejecutar(actual,estat)
 
         for i in self.Linstr:

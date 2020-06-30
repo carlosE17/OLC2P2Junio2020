@@ -4,5 +4,5 @@ node0 [    shape=plaintext
 
       <table cellspacing='0'>
       <tr><td>ID</td><td>Tipo</td><td>Temporal</td><td>valor</td><td>Linea</td></tr>
-<tr> <td> f</td><td> Entero </td><td> $t4 </td><td> 5 </td><td> 4</td> </tr>    </table>
+<tr> <td> ackermann</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 1</td> </tr><tr> <td> main</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 12</td> </tr>    </table>
 >];}

@@ -247,7 +247,7 @@ def p_global(t) :
     t[0] = t[1]
 
 def p_struct(t) :
-    'strucs_    : STRUCT ID LLAVEA instruct LLAVEC '
+    'strucs_    : STRUCT ID LLAVEA instruct LLAVEC PTCOMA'
     global noNodo
     t[0] = newDecStruct(t[2],t[4],t.lexpos(1),t.lineno(1),noNodo)
     noNodo+=2
@@ -264,7 +264,7 @@ def p_inStruct1(t):
 def p_funcion_(t):
     'funcion_   : tipo ID PARA posparams PARC LLAVEA posinstr LLAVEC'
     global noNodo
-    t[0] = newDecFuncion(t[1],t[2],t[4],t[7],t.lexpos(1),t.lineno(1),noNodo)
+    t[0] = newDecFuncion(t[1],t[2],t[4],t[7],t.lexpos(1),t.lineno(2),noNodo)
     noNodo+=5
 
 def p_posparam_(t):
@@ -679,7 +679,8 @@ def p_expresion_casteo(t):
             | PARA TDOBLE PARC exp
             | PARA exp PARC'''
     global noNodo
-    if t[2].lower()== 'int' : t[0]=newCasteoInt(t[4],t.lexpos(1),t.lineno(1),noNodo)
+    if not isinstance(t[2],str):t[0]=t[2]
+    elif t[2].lower()== 'int' : t[0]=newCasteoInt(t[4],t.lexpos(1),t.lineno(1),noNodo)
     elif t[2].lower()== 'float' : t[0]=newCasteoFloat(t[4],t.lexpos(1),t.lineno(1),noNodo)
     elif t[2].lower()== 'char' : t[0]=newCasteoChar(t[4],t.lexpos(1),t.lineno(1),noNodo)
     elif t[2].lower()== 'double' : t[0]=newCasteoFloat(t[4],t.lexpos(1),t.lineno(1),noNodo)

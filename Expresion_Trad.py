@@ -33,7 +33,7 @@ class id_:
         if temp!=None:
             return nodoC3d(temp.temporal,temp.tipo,'',[],[],temp.valor)
         else:
-            return nodoC3d(temp.temporal,newtipo(tipoPrimitivo.Error,''),'',[],[],temp.valor)
+            return nodoC3d('0',newtipo(tipoPrimitivo.Error,''),'',[],[],'0')
     
     def ejecutar(self,entorno,estat):
         return self.getvalor(entorno,estat)
@@ -61,11 +61,11 @@ class newSuma:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' + '+der.temporal+';\n'
                 v=izq.temporal+' + '+der.temporal
                 # print('c:\n'+c+'\n'+'der:\n'+str(der.valor)+'\n''type:\n'+str(type(der.valor))+'\n')
-                if der.valor=='0':
+                if der.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
-                elif izq.valor=='0':
+                elif izq.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
@@ -77,7 +77,7 @@ class newSuma:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' + '+der.temporal+';\n'
                 v=izq.temporal+' + '+der.temporal
                 
-                if izq.valor=='0':
+                if izq.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
@@ -91,7 +91,7 @@ class newSuma:
                 c+=t2+' = '+izq.temporal+' + '+t+';\n'
                 v=izq.temporal+' + '+der.temporal
 
-                if izq.valor=='0':
+                if izq.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
                     t2=t
                     v=der.valor
@@ -104,10 +104,10 @@ class newSuma:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' + '+der.temporal+';\n'
                 v=izq.temporal+' + '+der.temporal
                 
-                if izq.valor=='0':
+                if der.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'
-                    t=der.temporal
-                    v=der.valor
+                    t=izq.temporal
+                    v=izq.valor
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -138,10 +138,10 @@ class newSuma:
                 c+=t2+' = '+der.temporal+' + '+t+';\n'
                 v=izq.temporal+' + '+der.temporal
 
-                if der.valor=='0':
-                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                if der.temporal=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
                     t2=t
-                    v=der.valor
+                    v=izq.valor
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -184,11 +184,11 @@ class newResta:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' - '+der.temporal+';\n'
                 v=izq.temporal+' - '+der.temporal
                 
-                if der.valor=='0':
+                if der.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
-                elif izq.valor=='0':
+                elif izq.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
@@ -200,7 +200,7 @@ class newResta:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' - '+der.temporal+';\n'
                 v=izq.temporal+' - '+der.temporal
                 
-                if izq.valor=='0':
+                if izq.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
@@ -214,7 +214,7 @@ class newResta:
                 c+=t2+' = '+izq.temporal+' - '+t+';\n'
                 v=izq.temporal+' - '+der.temporal
 
-                if izq.valor=='0':
+                if izq.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
                     t2=t
                     v=der.valor
@@ -227,10 +227,10 @@ class newResta:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' - '+der.temporal+';\n'
                 v=izq.temporal+' - '+der.temporal
                 
-                if izq.valor=='0':
+                if der.temporal=='0':
                     c=izq.c3d+'\n'+der.c3d+'\n'
-                    t=der.temporal
-                    v=der.valor
+                    t=izq.temporal
+                    v=izq.valor
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -261,10 +261,10 @@ class newResta:
                 c+=t2+' = '+der.temporal+' - '+t+';\n'
                 v=izq.temporal+' - '+der.temporal
 
-                if der.valor=='0':
-                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                if der.temporal=='0':
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
                     t2=t
-                    v=der.valor
+                    v=izq.valor
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -305,11 +305,11 @@ class newMultiplicacion:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' * '+der.temporal+';\n'
                 v=izq.temporal+' * '+der.temporal
                 
-                if der.valor=='1':
+                if der.temporal=='1':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
-                elif izq.valor=='1':
+                elif izq.temporal=='1':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
@@ -321,7 +321,7 @@ class newMultiplicacion:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' * '+der.temporal+';\n'
                 v=izq.temporal+' * '+der.temporal
                 
-                if izq.valor=='1':
+                if izq.temporal=='1':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
@@ -335,7 +335,7 @@ class newMultiplicacion:
                 c+=t2+' = '+izq.temporal+' * '+t+';\n'
                 v=izq.temporal+' * '+der.temporal
 
-                if izq.valor=='1':
+                if izq.temporal=='1':
                     c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
                     t2=t
                     v=der.valor
@@ -348,10 +348,10 @@ class newMultiplicacion:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' * '+der.temporal+';\n'
                 v=izq.temporal+' * '+der.temporal
                 
-                if izq.valor=='1':
+                if der.temporal=='1':
                     c=izq.c3d+'\n'+der.c3d+'\n'
-                    t=der.temporal
-                    v=der.valor
+                    t=izq.temporal
+                    v=izq.valor
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -382,7 +382,7 @@ class newMultiplicacion:
                 c+=t2+' = '+der.temporal+' * '+t+';\n'
                 v=izq.temporal+' * '+der.temporal
 
-                if der.valor=='1':
+                if der.temporal=='1':
                     c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
                     t2=t
                     v=der.valor
@@ -426,14 +426,11 @@ class newDivision:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' / '+der.temporal+';\n'
                 v=izq.temporal+' / '+der.temporal
                 
-                if der.valor=='1':
+                if der.temporal=='1':
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
-                elif izq.valor=='1':
-                    c=izq.c3d+'\n'+der.c3d+'\n'
-                    t=der.temporal
-                    v=der.valor
+                
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -442,10 +439,7 @@ class newDivision:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' / '+der.temporal+';\n'
                 v=izq.temporal+' / '+der.temporal
                 
-                if izq.valor=='1':
-                    c=izq.c3d+'\n'+der.c3d+'\n'
-                    t=der.temporal
-                    v=der.valor
+                
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -456,10 +450,7 @@ class newDivision:
                 c+=t2+' = '+izq.temporal+' / '+t+';\n'
                 v=izq.temporal+' / '+der.temporal
 
-                if izq.valor=='1':
-                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
-                    t2=t
-                    v=der.valor
+                
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -469,10 +460,7 @@ class newDivision:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' / '+der.temporal+';\n'
                 v=izq.temporal+' / '+der.temporal
                 
-                if izq.valor=='1':
-                    c=izq.c3d+'\n'+der.c3d+'\n'
-                    t=der.temporal
-                    v=der.valor
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -504,9 +492,9 @@ class newDivision:
                 v=izq.temporal+' / '+der.temporal
 
                 if der.valor=='1':
-                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
                     t2=t
-                    v=der.valor
+                    v=izq.valor
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -1310,7 +1298,7 @@ class newArreglo:
             if e.tipo.tipo==tipoPrimitivo.Error:
                 estat.Lerrores.append(CError('Semantico','Error al crear el arreglo',self.columna,self.linea))
                 return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
-            c+=i.c3d+'\n'+t+'['+str(n)+']'+'='+i.temporal+';\n'
+            c+=e.c3d+'\n'+t+'['+str(n)+']'+'='+e.temporal+';\n'
             if n==0:
                 prof=e.profundidad
             n+=1 
@@ -1375,7 +1363,7 @@ class newAccesoStr:
             estat.Lerrores.append(CError('Semantico','Error al realizar acceso',self.columna,self.linea))
             return nodoC3d('',newtipo(tipoPrimitivo.Error,''),'',[],[],'')
         
-        t=izq.temporal+'['+i+']'
+        t=izq.temporal+'[\''+i+'\']'
         c=izq.c3d+'\n'
         v=t
         return nodoC3d(t,newtipo(tipoPrimitivo.acceso,''),c,[],[],v)

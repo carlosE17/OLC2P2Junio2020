@@ -368,6 +368,7 @@ def p_error(t):
     global Lerr
     Lerr.append(CError('Sintactico','Se encontro \''+str(t.value)+'\'',str(t.lexpos),str(t.lineno)))
     print("Error sintáctico en '%s'" % t.value)
+    print('linea: '+str(t.lineno))
     while True:
         tok = parser.token()             # Get the next token
         if not tok or tok.type == 'PTCOMA': 
