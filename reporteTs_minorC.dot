@@ -4,5 +4,5 @@ node0 [    shape=plaintext
 
       <table cellspacing='0'>
       <tr><td>ID</td><td>Tipo</td><td>Temporal</td><td>valor</td><td>Linea</td></tr>
-<tr> <td> ackermann</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 1</td> </tr><tr> <td> main</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 12</td> </tr>    </table>
+<tr> <td> factorial</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 11</td> </tr><tr> <td> potencia</td><td> funcion Doble </td><td> --- </td><td> --- </td><td> 22</td> </tr><tr> <td> mcd</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 31</td> </tr><tr> <td> fibonacci</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 40</td> </tr><tr> <td> hanoi</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 49</td> </tr><tr> <td> hofstaderFemenina</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 62</td> </tr><tr> <td> hofstaderMasculino</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 76</td> </tr><tr> <td> ackermann</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 90</td> </tr><tr> <td> main</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 101</td> </tr>    </table>
 >];}

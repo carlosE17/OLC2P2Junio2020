@@ -7,7 +7,7 @@ class primitivo:
     def __init__(self,t,v,c,l,n):
         self.columna=c
         self.linea=l
-        self.vNodo=nodoAST(v,n)
+        self.vNodo=nodoAST(str(v).replace('>',r'\>').replace('<',r'\<'),n)
         self.valor=str(v)
         self.tipo=t
         self.gramm='\n<tr><td>EXP::= '+str(v)+' </td><td> EXP= primitivo('+str(v)+');  </td></tr>'
@@ -62,13 +62,21 @@ class newSuma:
                 v=izq.temporal+' + '+der.temporal
                 # print('c:\n'+c+'\n'+'der:\n'+str(der.valor)+'\n''type:\n'+str(type(der.valor))+'\n')
                 if der.temporal=='0':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "\n<tr><td>"+'Aritmetica Suma'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>\n")
+
                 elif izq.temporal=='0':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Suma'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -78,9 +86,13 @@ class newSuma:
                 v=izq.temporal+' + '+der.temporal
                 
                 if izq.temporal=='0':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Suma'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -92,9 +104,13 @@ class newSuma:
                 v=izq.temporal+' + '+der.temporal
 
                 if izq.temporal=='0':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
                     t2=t
                     v=der.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Suma'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -105,9 +121,13 @@ class newSuma:
                 v=izq.temporal+' + '+der.temporal
                 
                 if der.temporal=='0':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Suma'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -139,9 +159,13 @@ class newSuma:
                 v=izq.temporal+' + '+der.temporal
 
                 if der.temporal=='0':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
                     t2=t
                     v=izq.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Suma'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -154,6 +178,21 @@ class newSuma:
         t=estat.newTemp()
         c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'+'+der.temporal+';\n'
         v=izq.temporal+' + '+der.temporal
+        if der.temporal=='0':
+            xdOptimizar=c
+            c=izq.c3d+'\n'+der.c3d+'\n'
+            t=izq.temporal
+            v=izq.valor
+            with open('reporteOptimizacion_minorC.dot', "a") as f:
+                f.write( "\n<tr><td>"+'Aritmetica Suma'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>\n")
+        elif izq.temporal=='0':
+            xdOptimizar=c
+            c=izq.c3d+'\n'+der.c3d+'\n'
+            t=der.temporal
+            v=der.valor
+            with open('reporteOptimizacion_minorC.dot', "a") as f:
+                f.write( "<tr><td>"+'Aritmetica Suma'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
         return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -185,13 +224,14 @@ class newResta:
                 v=izq.temporal+' - '+der.temporal
                 
                 if der.temporal=='0':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
-                elif izq.temporal=='0':
-                    c=izq.c3d+'\n'+der.c3d+'\n'
-                    t=der.temporal
-                    v=der.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Resta'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -200,10 +240,7 @@ class newResta:
                 c=izq.c3d+'\n'+der.c3d+'\n'+t+' = '+izq.temporal+' - '+der.temporal+';\n'
                 v=izq.temporal+' - '+der.temporal
                 
-                if izq.temporal=='0':
-                    c=izq.c3d+'\n'+der.c3d+'\n'
-                    t=der.temporal
-                    v=der.valor
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -214,10 +251,6 @@ class newResta:
                 c+=t2+' = '+izq.temporal+' - '+t+';\n'
                 v=izq.temporal+' - '+der.temporal
 
-                if izq.temporal=='0':
-                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
-                    t2=t
-                    v=der.valor
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -228,9 +261,13 @@ class newResta:
                 v=izq.temporal+' - '+der.temporal
                 
                 if der.temporal=='0':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Resta'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -261,10 +298,7 @@ class newResta:
                 c+=t2+' = '+der.temporal+' - '+t+';\n'
                 v=izq.temporal+' - '+der.temporal
 
-                if der.temporal=='0':
-                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
-                    t2=t
-                    v=izq.valor
+
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -277,6 +311,15 @@ class newResta:
         t=estat.newTemp()
         c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'-'+der.temporal+';\n'
         v=izq.temporal+' - '+der.temporal
+
+        if der.temporal=='0':
+            xdOptimizar=c
+            c=izq.c3d+'\n'+der.c3d+'\n'
+            t=izq.temporal
+            v=izq.valor
+            with open('reporteOptimizacion_minorC.dot', "a") as f:
+                f.write( "<tr><td>"+'Aritmetica Resta'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
         return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -306,13 +349,21 @@ class newMultiplicacion:
                 v=izq.temporal+' * '+der.temporal
                 
                 if der.temporal=='1':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Multiplicacion'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
                 elif izq.temporal=='1':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Multiplicacion'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -322,9 +373,13 @@ class newMultiplicacion:
                 v=izq.temporal+' * '+der.temporal
                 
                 if izq.temporal=='1':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=der.temporal
                     v=der.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Multiplicacion'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -336,9 +391,13 @@ class newMultiplicacion:
                 v=izq.temporal+' * '+der.temporal
 
                 if izq.temporal=='1':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
                     t2=t
                     v=der.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Multiplicacion'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -349,9 +408,13 @@ class newMultiplicacion:
                 v=izq.temporal+' * '+der.temporal
                 
                 if der.temporal=='1':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Multiplicacion'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -383,9 +446,13 @@ class newMultiplicacion:
                 v=izq.temporal+' * '+der.temporal
 
                 if der.temporal=='1':
-                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+der.temporal+';\n'
+                    xdOptimizar=c
+                    c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
                     t2=t
-                    v=der.valor
+                    v=izq.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Multiplicacion'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -397,6 +464,23 @@ class newMultiplicacion:
         t=estat.newTemp()
         c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'*'+der.temporal+';\n'
         v=izq.temporal+' * '+der.temporal
+
+        if der.temporal=='1':
+            xdOptimizar=c
+            c=izq.c3d+'\n'+der.c3d+'\n'
+            t=izq.temporal
+            v=izq.valor
+            with open('reporteOptimizacion_minorC.dot', "a") as f:
+                f.write( "<tr><td>"+'Aritmetica Multiplicacion'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
+        elif izq.temporal=='1':
+            xdOptimizar=c
+            c=izq.c3d+'\n'+der.c3d+'\n'
+            t=der.temporal
+            v=der.valor
+            with open('reporteOptimizacion_minorC.dot', "a") as f:
+                f.write( "<tr><td>"+'Aritmetica Multiplicacion'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
         return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 
@@ -427,9 +511,13 @@ class newDivision:
                 v=izq.temporal+' / '+der.temporal
                 
                 if der.temporal=='1':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'
                     t=izq.temporal
                     v=izq.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Division'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
                 
 
                 return nodoC3d(t,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
@@ -492,9 +580,13 @@ class newDivision:
                 v=izq.temporal+' / '+der.temporal
 
                 if der.valor=='1':
+                    xdOptimizar=c
                     c=izq.c3d+'\n'+der.c3d+'\n'+t+' = (int) '+izq.temporal+';\n'
                     t2=t
                     v=izq.valor
+                    with open('reporteOptimizacion_minorC.dot', "a") as f:
+                        f.write( "<tr><td>"+'Aritmetica Division'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
                 return nodoC3d(t2,newtipo(tipoPrimitivo.Doble,''),c,[],[],v)
 
@@ -506,6 +598,15 @@ class newDivision:
         t=estat.newTemp()
         c=izq.c3d+'\n'+der.c3d+'\n'+t+'='+izq.temporal+'/'+der.temporal+';\n'
         v=izq.temporal+' / '+der.temporal
+
+        if der.temporal=='1':
+            xdOptimizar=c
+            c=izq.c3d+'\n'+der.c3d+'\n'
+            t=izq.temporal
+            v=izq.valor
+            with open('reporteOptimizacion_minorC.dot', "a") as f:
+                f.write( "<tr><td>"+'Aritmetica Division'+"</td><td>"+xdOptimizar+"</td><td>"+c+'<br/>'+t+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
         return nodoC3d(t,newtipo(tipoPrimitivo.Entero,''),c,[],[],v)
 

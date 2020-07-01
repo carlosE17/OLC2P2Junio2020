@@ -45,34 +45,43 @@ def traducir(Linstr,c,Le,tabs):
     except Exception as e:
         print('veentana[46]'+str(e))
 
-    # try:
-    #     i=0
-    #     while i<len(Linstr):
-    #         cTemp=Linstr[i].ejecutar(entornoG,ast)
-    #         if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
-    #             c3dVarGlobales+=cTemp.c3d+''
-    #         elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
-    #             c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
-    #         i+=1
-    # except Exception as e:
-    #     print('veentana[58]'+str(e))
 
-    i=0
-    while i<len(Linstr):
-        cTemp=Linstr[i].ejecutar(entornoG,ast)
-        if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
-            c3dVarGlobales+=cTemp.c3d+''
-        elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
-            c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
-        i+=1
-    
+    with open('reporteOptimizacion_minorC.dot', "w") as f:
+        f.write('digraph {\n'+"node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>TIPO</td><td>Antes</td><td>Despues</td><td>Linea</td></tr>\n")
+
+
+    try:
+        i=0
+        while i<len(Linstr):
+            cTemp=Linstr[i].ejecutar(entornoG,ast)
+            if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
+                c3dVarGlobales+=cTemp.c3d+''
+            elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
+                c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
+            i+=1
+    except Exception as e:
+        print('veentana[58]'+str(e))
+
+    # i=0
+    # while i<len(Linstr):
+    #     cTemp=Linstr[i].ejecutar(entornoG,ast)
+    #     if isinstance(Linstr[i],InstrminorC.newAsignacion) or isinstance(Linstr[i],InstrminorC.newDeclaracion):
+    #         c3dVarGlobales+=cTemp.c3d+''
+    #     elif isinstance(Linstr[i],InstrminorC.newDecFuncion):
+    #         c3dPerFuncion[Linstr[i].nombre]=cTemp.c3d                     
+    #     i+=1
+
+    with open('reporteOptimizacion_minorC.dot', "a") as f:
+        f.write( "    </table>\n" + ">];}")
+
+
     c3dOptimizado='main:\n'+c3dVarGlobales+'\n'
     for k,v in c3dPerFuncion.items():
         if k.lower()=='main': c3dOptimizado+=v+'\n'
     c3dOptimizado+='return:\n'+ast.retornos+'\nexit; \n'
 
     for k,v in c3dPerFuncion.items():
-        if k.lower()!='main': c3dOptimizado+=k+':\n'+v+'\n'
+        if k.lower()!='main': c3dOptimizado+=k+':#-----------------------Funcion-------------------------\n'+v+'\n'
     
 
 
@@ -87,7 +96,7 @@ def traducir(Linstr,c,Le,tabs):
 
     # print(c3dOptimizado)
 
-    # correrAugus(c3dOptimizado,c)
+    correrAugus(c3dOptimizado,c)
 
     c3dPAraDebug=c3dOptimizado
 
@@ -301,17 +310,20 @@ def gReporteTs(L,etiq):
     nTipos=['Int','String','Float','Array','error',' ',' ','puntero']
     texto='digraph {\n'
     t=''
+    # print(L)
+    # print(etiq)
     for k,v in L:
+        
         if int(v.tipo.value)-1==7:
             t+="<tr> <td> " + str(k) + "</td><td> " + nTipos[int(v.tipo.value)-1] + " </td><td> " + str(v.valor.exp.variable) + " </td><td> "+'0' + " </td><td> " + str(v.valor.linea) + " </td><td> "+ str(v.valor.exp.variable) + "</td> </tr>"
         elif int(v.tipo.value)-1==3:
             t+="<tr> <td> " + str(k) + "</td><td> " + nTipos[int(v.tipo.value)-1] + " </td><td> " + str(v.valor.getTabla()) + " </td><td> "+str(v.valor.getProfundidad()) + " </td><td> " + str(v.valor.linea) + " </td><td> "+ '---' + "</td> </tr>"            
         elif int(v.tipo.value)==9:
-            t+="<tr> <td> " + str(k) + "</td><td> " + 'Etiqueta' + " </td><td> " + str(v.valor) + " </td><td> "+'0' + " </td><td> " + str(etiq[str(k).replace(':','')]+1) + " </td><td> "+ '---' + "</td> </tr>"            
+            t+="<tr> <td> " + str(k) + "</td><td> " + 'Etiqueta' + " </td><td> " + str(v.valor) + " </td><td> "+'0' + " </td><td> " + str(etiq[str(k)]+1) + " </td><td> "+ '---' + "</td> </tr>"            
         elif int(v.tipo.value)==10:
-            t+="<tr> <td> " + str(k) + "</td><td> " + 'Funcion' + " </td><td> " + str(v.valor) + " </td><td> "+'0' + " </td><td> " + str(etiq[str(k).replace(':','')]+1) + " </td><td> "+ '---' + "</td> </tr>"
+            t+="<tr> <td> " + str(k) + "</td><td> " + 'Funcion' + " </td><td> " + str(v.valor) + " </td><td> "+'0' + " </td><td> " + str(etiq[str(k)]+1) + " </td><td> "+ '---' + "</td> </tr>"
         elif int(v.tipo.value)==11:
-            t+="<tr> <td> " + str(k) + "</td><td> " + 'Metodo' + " </td><td> " + str(v.valor) + " </td><td> "+'0' + " </td><td> " + str(etiq[str(k).replace(':','')]+1) + " </td><td> "+ '---' + "</td> </tr>"                    
+            t+="<tr> <td> " + str(k) + "</td><td> " + 'Metodo' + " </td><td> " + str(v.valor) + " </td><td> "+'0' + " </td><td> " + str(etiq[str(k)]+1) + " </td><td> "+ '---' + "</td> </tr>"                    
         else:                
             t+="<tr> <td> " + str(k) + "</td><td> " + nTipos[int(v.tipo.value)-1] + " </td><td> " + str(v.valor.valor) + " </td><td> "+'0' + " </td><td> " + str(v.valor.linea) + " </td><td> "+ '---' + "</td> </tr>"
     texto += "node0" + " ["+ "    shape=plaintext\n"+ "    label=<\n"+ "\n" +"      <table cellspacing='0'>\n"+ "      <tr><td>ID</td><td>Tipo</td><td>Valor</td><td>Dimension</td><td>Linea</td><td>Referencia</td></tr>\n"+ t+ "    </table>\n" + ">];}"
@@ -414,7 +426,8 @@ class Ventana:
         menuReportesc3d.add_command(label="Tabla de Simbolos", command=self.tbSimbc3d)
         menuReportesc3d.add_command(label="AST",command=self.astRepoc3d)
         menuReportesc3d.add_command(label="Reporte Gramatical", command=self.repoGramc3d)
-        # 0000
+        menuReportesc3d.add_command(label="Reporte Optimizacion", command=self.repoOptimizacion)
+        # 0000 repoOptimizacion
         menuRepoImgc3d.add_command(label='Todos los Errores',command=self.repoErrores2c3d)
         menuRepoImgc3d.add_separator()
         menuRepoImgc3d.add_command(label="Errores Lexicos", command=self.errLex2c3d)
@@ -424,6 +437,7 @@ class Ventana:
         menuRepoImgc3d.add_command(label="Tabla de Simbolos", command=self.tbSimb2c3d)
         menuRepoImgc3d.add_command(label="AST",command=self.astRepo2c3d)
         menuRepoImgc3d.add_command(label="Reporte Gramatical", command=self.repoGram2c3d)
+        menuRepoImgc3d.add_command(label="Reporte Optimizacion", command=self.repoOptimizacion2)
         
         # -------------------------------------------------------------------------------------------------augus------------
 
@@ -702,7 +716,7 @@ class Ventana:
         entrada=popupRepo(parent,'reporteErrores_minorC.dot.png')
         parent.wait_window(entrada.top)
     
-# -----------------
+    # -----------------
     def errLex(self):
         s = Source.from_file("reporteErroresLexicos.dot", format="pdf")
         s.view()
@@ -766,6 +780,18 @@ class Ventana:
         s.render()
         parent = self.salida.master
         entrada=popupRepo(parent,'reporteErrores.dot.png')
+        parent.wait_window(entrada.top)
+
+    def repoOptimizacion(self):
+        s = Source.from_file("reporteOptimizacion_minorC.dot", format="pdf")
+        s.view()
+
+
+    def repoOptimizacion2(self):
+        s = Source.from_file("reporteOptimizacion_minorC.dot", format="png")
+        s.render()
+        parent = self.salida.master
+        entrada=popupRepo(parent,'reporteOptimizacion_minorC.dot.png')
         parent.wait_window(entrada.top)
 
 

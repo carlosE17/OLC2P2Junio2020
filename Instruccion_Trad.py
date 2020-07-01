@@ -63,6 +63,7 @@ class newDecFuncion:
         self.vNodo.hijos.append(nodoAST('{ INSTRUCCIONES }',n+4))
         for i in Linst:
             self.vNodo.hijos[3].hijos.append(i.vNodo)
+            self.gramm+=i.gramm
     
     def ejecutar(self,entorno,estat):
         actual=Entorno(entorno)
@@ -86,7 +87,12 @@ class newDecFuncion:
         if len(breaks)>0 or len(continues)>0:
             estat.Lerrores.append(CError('Semantico','Error se encontro un break o continue fuera de un ciclo',self.columna,self.linea))
         
-        c+='goto return;\n'
+        if not isinstance(self.Linstrucciones[len(self.Linstrucciones)-1],newRetorno):
+            c+='goto return;\n'
+        else:
+            with open('reporteOptimizacion_minorC.dot', "a") as f:
+                f.write( "<tr><td>"+'Codigo Muerto'+"</td><td>"+'goto return; <br/> goto return;'+"</td><td>"+' goto return; '+"</td><td>"+str(self.linea)+"</td></tr>")
+
 
 
 
@@ -291,14 +297,16 @@ class newLlamadaInstr:
                 cantcast=0
 
                 while cantcast<len(casteos):
-                    p=self.parametros[contando].getvalor(entorno,estat)
+                    
                     if cantcast==0:
                         cod+='print(\''+casteos[cantcast]+'\');\n'
-                        contando-=1
+                        
                     elif casteos[cantcast]=='':
                         print('')
                     elif casteos[cantcast][0].lower()=='d' or casteos[cantcast][0].lower()=='i':
                         tt=estat.newTemp()
+                        p=self.parametros[contando].getvalor(entorno,estat)
+                        contando+=1
                         cod+=p.c3d
                         cod+=tt+'=(int)'+p.temporal+';\n'
                         cod+='print('+tt+');\n'
@@ -306,6 +314,8 @@ class newLlamadaInstr:
                         
                     elif casteos[cantcast][0].lower()=='c':
                         tt=estat.newTemp()
+                        p=self.parametros[contando].getvalor(entorno,estat)
+                        contando+=1
                         cod+=p.c3d
                         cod+=tt+'=(char)'+p.temporal+';\n'
                         cod+='print('+tt+');\n'
@@ -313,19 +323,23 @@ class newLlamadaInstr:
                         
                     elif casteos[cantcast][0].lower()=='f':
                         tt=estat.newTemp()
+                        p=self.parametros[contando].getvalor(entorno,estat)
+                        contando+=1
                         cod+=p.c3d
                         cod+=tt+'=(float)'+p.temporal+';\n'
                         cod+='print('+tt+');\n'
                         cod+='print(\''+casteos[cantcast][1:]+'\');\n'
                         
                     elif casteos[cantcast][0].lower()=='s':
+                        p=self.parametros[contando].getvalor(entorno,estat)
+                        contando+=1
                         cod+=p.c3d
                         cod+='print('+p.temporal+');\n'
                         cod+='print(\''+casteos[cantcast][1:]+'\');\n'
                         
                     
                     # verificar cantidades correctas de %
-                    contando+=1
+                    
                     if contando==len(self.parametros): contando=contando-1
                     cantcast+=1
 
@@ -350,12 +364,14 @@ class newLlamadaInstr:
         c='$sp=$sp+1;\n'
         tempoEntActual=[]
         ent=entorno
-        for k,v in ent.tabla.items():
-            c+='$s0[$sp]='+v.temporal+';\n'
-            c+='$sp=$sp+1;\n'
-            tempoEntActual.append(v.temporal)
+        while ent.anterior!=None:
+            for k,v in ent.tabla.items():
+                c+='$s0[$sp]='+v.temporal+';\n'
+                c+='$sp=$sp+1;\n'
+                tempoEntActual.append(v.temporal)
+            ent=ent.anterior
             # ------------------------------------------------------------
-        print(entorno.tabla.items())
+        
         t=estat.newTemp()
         c+=t+'=$sp+1;\n'
         for p in self.parametros:
@@ -366,17 +382,19 @@ class newLlamadaInstr:
 
         contador=estat.getRa()
         etiquetaRetorno=estat.newetiquetaL()
+        # print(etiquetaRetorno)
         c+='$ra=$ra+1;\n$s1[$ra]='+contador+';\n'
         tcond=estat.newTemp()
         estat.retornos+=tcond+'=$s1[$ra]=='+contador+';\n'+'if('+tcond+') goto '+etiquetaRetorno+';\n'
+        # print(etiquetaRetorno)
         c+='goto '+self.nombre+';\n'+etiquetaRetorno+':\n'
         c+='$ra=$ra-1;\n'
         aDevolver=estat.newTemp()
         c+=aDevolver+'=$s0[$sp];\n'
         i=len(tempoEntActual)-1
-        print('i-> '+str(i))
+        # print(c+'\n\n')
         while i>=0:
-            c+='$sp=$sp-1;#----------------------------------------------\n'
+            c+='$sp=$sp-1;\n'
             c+=tempoEntActual[i]+'=$s0[$sp];\n'
             i-=1
         # ----------------------------------------------------------------------
@@ -444,7 +462,7 @@ class newSubIF:
         for i in instr:
             self.vNodo.hijos[1].hijos.append(i.vNodo)
             self.gramm+=i.gramm
-# etiquetas de salida, etiqueta de break y continue
+    # etiquetas de salida, etiqueta de break y continue
     def ejecutar(self,entorno,estat):
         c=''
         resultado=self.condicion.getvalor(entorno,estat)
