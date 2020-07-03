@@ -6,116 +6,32 @@ node0 [    shape=plaintext
       <tr><td>PRODUCCION</td><td>ACCIONES</td></tr>
 <tr><td>INICIO::= INSTRUCCIONES </td><td> INICIO=INSTRUCCIONES; </td></tr>
 <tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
-<tr><td>ID::= factorial  </td><td> ID=factorial;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= n  </td><td> ID=n;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>INSTRUCCION::= SWITCH( EXP ) { LCASOS }  </td><td> INSTRUCCION=newSwitch(EXP, LCASOS); </td></tr>
-<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>
-<tr><td>ID::= n </td><td> ID= id_(n);  </td></tr><tr><td>LCASOS::= CASE EXP : INSTRUCCIONES  </td><td> LCASOS=newCaso(EXP, INSTRUCCIONES); </td></tr>
-<tr><td>EXP::= 0 </td><td> EXP= primitivo(0);  </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= 1 </td><td> EXP= primitivo(1);  </td></tr><tr><td>LCASOS::= CASE EXP : INSTRUCCIONES  </td><td> LCASOS=newCaso(EXP, INSTRUCCIONES); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= EXP1 * EXP2 </td><td> EXP= newMultiplicacion(EXP1,EXP2);  </td></tr>
-
-<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>
-<tr><td>ID::= n </td><td> ID= id_(n);  </td></tr>
-<tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= - EXP  </td><td> EXP= newNegacion(EXP);  </td></tr>
-
-<tr><td>EXP::= 100 </td><td> EXP= primitivo(100);  </td></tr>
-<tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
-<tr><td>ID::= potencia  </td><td> ID=potencia;  </td></tr>
-<tr><td>TIPO::= Doble  </td><td> TIPO=Doble;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= base  </td><td> ID=base;  </td></tr>
-<tr><td>TIPO::= Doble  </td><td> TIPO=Doble;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= exp  </td><td> ID=exp;  </td></tr>
-<tr><td>TIPO::= Doble  </td><td> TIPO=Doble;  </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= 1 </td><td> EXP= primitivo(1);  </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= EXP1 * EXP2 </td><td> EXP= newMultiplicacion(EXP1,EXP2);  </td></tr>
-
-<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>
-<tr><td>ID::= base </td><td> ID= id_(base);  </td></tr>
-<tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= - EXP  </td><td> EXP= newNegacion(EXP);  </td></tr>
-
-<tr><td>EXP::= 100 </td><td> EXP= primitivo(100);  </td></tr>
-<tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
-<tr><td>ID::= mcd  </td><td> ID=mcd;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= n1  </td><td> ID=n1;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= n2  </td><td> ID=n2;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr>
-<tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
-<tr><td>ID::= fibonacci  </td><td> ID=fibonacci;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= n  </td><td> ID=n;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>
-<tr><td>ID::= n </td><td> ID= id_(n);  </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= EXP1 + EXP2 </td><td> EXP= newSuma(EXP1,EXP2);  </td></tr>
-<tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr>
-<tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= - EXP  </td><td> EXP= newNegacion(EXP);  </td></tr>
-
-<tr><td>EXP::= 100 </td><td> EXP= primitivo(100);  </td></tr>
-<tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
-<tr><td>ID::= hanoi  </td><td> ID=hanoi;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= discos  </td><td> ID=discos;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= origen  </td><td> ID=origen;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= auxiliar  </td><td> ID=auxiliar;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= destino  </td><td> ID=destino;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>DECLARACION::= TIPO LDECLA ;  </td><td> PARAMETRO=newDeclaracion(TIPO,LDECLA); </td></tr><tr><td>LDECLA::= LDECLA DECLA ;  </td><td> LDECLA.append(DECLA); </td></tr><tr><td>DECLA::= ID POSC POSEXP </td><td> PARAMETRO=newDecla(ID, POSC, POSEXP); </td></tr>
-<tr><td>ID::= result  </td><td> ID=result;  </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>INSTRUCCION::= VARIABLE INDICES = EXP ; </td><td> INSTRUCCION=newAsignacion(VARIABLE,INDICES,EXP); </td></tr>
-<tr><td>VARIABLE::= result : </td><td> VARIABLE=result;  </td></tr>
-<tr><td>INDICES::= INDICES1 [ EXP ] : </td><td> INDICES=INDICES1; INDICES.append(EXP);  </td></tr>
-<tr><td>INDICES::= [EXP] : </td><td> INDICES=[]; INDICES.append(EXP);  </td></tr>
-<tr><td>EXP::= EXP1 + EXP2 </td><td> EXP= newSuma(EXP1,EXP2);  </td></tr>
-
-<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>
-<tr><td>ID::= result </td><td> ID= id_(result);  </td></tr>
-
-<tr><td>EXP::= EXP1 + EXP2 </td><td> EXP= newSuma(EXP1,EXP2);  </td></tr>
-
-<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>
-<tr><td>ID::= origen </td><td> ID= id_(origen);  </td></tr>
-
-<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>
-<tr><td>ID::= destino </td><td> ID= id_(destino);  </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>
-<tr><td>ID::= result </td><td> ID= id_(result);  </td></tr>
-<tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
-<tr><td>ID::= hofstaderFemenina  </td><td> ID=hofstaderFemenina;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= n  </td><td> ID=n;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= 0 </td><td> EXP= primitivo(0);  </td></tr>
-<tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
-<tr><td>ID::= hofstaderMasculino  </td><td> ID=hofstaderMasculino;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= n  </td><td> ID=n;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= 0 </td><td> EXP= primitivo(0);  </td></tr>
-<tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
-<tr><td>ID::= ackermann  </td><td> ID=ackermann;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= m  </td><td> ID=m;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>PARAMETRO::= TIPO ID [] </td><td> PARAMETRO=newDecParam(TIPO,ID); </td></tr>
-<tr><td>ID::= n  </td><td> ID=n;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
-<tr><td>EXP::= EXP1 + EXP2 </td><td> EXP= newSuma(EXP1,EXP2);  </td></tr>
-
-<tr><td>EXP::= ID </td><td> EXP= ID;  </td></tr>
-<tr><td>ID::= n </td><td> ID= id_(n);  </td></tr>
-
-<tr><td>EXP::= 1 </td><td> EXP= primitivo(1);  </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr>
-<tr><td>GLOBALES::= TIPO ID (PARAMETROS) { INSTRUCCIONES } </td><td> GLOBALES=newDecFuncion(TIPO,ID,PARAMETROS,INSTRUCCIONES); </td></tr>
 <tr><td>ID::= main  </td><td> ID=main;  </td></tr>
-<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>DECLARACION::= TIPO LDECLA ;  </td><td> PARAMETRO=newDeclaracion(TIPO,LDECLA); </td></tr><tr><td>LDECLA::= LDECLA DECLA ;  </td><td> LDECLA.append(DECLA); </td></tr><tr><td>DECLA::= ID POSC POSEXP </td><td> PARAMETRO=newDecla(ID, POSC, POSEXP); </td></tr>
-<tr><td>ID::= result  </td><td> ID=result;  </td></tr>
-<tr><td>EXP::= 28 </td><td> EXP= primitivo(28);  </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>INSTRUCCION::=LSUBIF POSELSE  </td><td> INSTRUCCION=newIF(LSUBIF, POSELSE); </td></tr><tr><td>LSUBIF::= ELSE? IF (EXP) { INSTRUCCIONES }   </td><td> INSTRUCCION=newSubIF(EXP, INSTRUCCIONES); </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr>
+<tr><td>TIPO::= Entero  </td><td> TIPO=Entero;  </td></tr><tr><td>EXP::= ID (PARAMETROS)  </td><td> EXP=newLlamadaInstr(ID,PARAMETRO); </td></tr><tr><td>DECLARACION::= TIPO LDECLA ;  </td><td> PARAMETRO=newDeclaracion(TIPO,LDECLA); </td></tr><tr><td>LDECLA::= LDECLA DECLA ;  </td><td> LDECLA.append(DECLA); </td></tr><tr><td>DECLA::= ID POSC POSEXP </td><td> PARAMETRO=newDecla(ID, POSC, POSEXP); </td></tr>
+<tr><td>ID::= a  </td><td> ID=a;  </td></tr>
+<tr><td>EXP::= EXP1 + EXP2 </td><td> EXP= newSuma(EXP1,EXP2);  </td></tr>
+
+<tr><td>EXP::= 5 </td><td> EXP= primitivo(5);  </td></tr>
+
+<tr><td>EXP::= 0 </td><td> EXP= primitivo(0);  </td></tr><tr><td>DECLA::= ID POSC POSEXP </td><td> PARAMETRO=newDecla(ID, POSC, POSEXP); </td></tr>
+<tr><td>ID::= b  </td><td> ID=b;  </td></tr>
+<tr><td>EXP::= EXP1 - EXP2 </td><td> EXP= newResta(EXP1,EXP2);  </td></tr>
+
+<tr><td>EXP::= 5 </td><td> EXP= primitivo(5);  </td></tr>
+
+<tr><td>EXP::= 0 </td><td> EXP= primitivo(0);  </td></tr><tr><td>DECLA::= ID POSC POSEXP </td><td> PARAMETRO=newDecla(ID, POSC, POSEXP); </td></tr>
+<tr><td>ID::= c  </td><td> ID=c;  </td></tr>
+<tr><td>EXP::= EXP1 + EXP2 </td><td> EXP= newSuma(EXP1,EXP2);  </td></tr>
+
+<tr><td>EXP::= 0 </td><td> EXP= primitivo(0);  </td></tr>
+
+<tr><td>EXP::= 5 </td><td> EXP= primitivo(5);  </td></tr><tr><td>DECLA::= ID POSC POSEXP </td><td> PARAMETRO=newDecla(ID, POSC, POSEXP); </td></tr>
+<tr><td>ID::= d  </td><td> ID=d;  </td></tr>
+<tr><td>EXP::= EXP1 - EXP2 </td><td> EXP= newResta(EXP1,EXP2);  </td></tr>
+
+<tr><td>EXP::= 0 </td><td> EXP= primitivo(0);  </td></tr>
+
+<tr><td>EXP::= 5 </td><td> EXP= primitivo(5);  </td></tr><tr><td>INSTRUCCION::= RETORNO EXP;  </td><td> LCASOS=newRetorno(EXP); </td></tr>
+<tr><td>EXP::= 0 </td><td> EXP= primitivo(0);  </td></tr>
     </table>
 >];}

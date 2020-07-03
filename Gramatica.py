@@ -775,14 +775,18 @@ def p_exp_ternaria(t):
 
 def p_error(t):
     global Lerr
-    Lerr.append(CError('Sintactico','Se encontro \''+str(t.value)+'\'',str(t.lexpos),str(t.lineno)))
-    print("Error sintáctico en '%s'" % t.value)
+    if hasattr(t,'value'):
+        Lerr.append(CError('Sintactico','Se encontro \''+str(t.value)+'\'',str(t.lexpos),str(t.lineno)))
+        print("Error sintáctico en '%s'" % t.value)
+    else:
+        Lerr.append(CError('Sintactico','Se encontro \''+str(t)+'\'',str(t.lexpos),str(t.lineno)))
+        print("Error sintáctico en '%s'" % t)
     while True:
         tok = parser.token()             # Get the next token  
         if not tok or tok.type == 'PTCOMA': 
             break
     # t.lexer.skip(1)
-    tok = parser.token()
+    # tok = parser.token()
     parser.errok()
     return tok 
 

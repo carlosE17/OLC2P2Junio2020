@@ -286,6 +286,11 @@ class newLlamadaInstr:
                 estat.Lerrores.append(CError('Semantico','No se esperaban parametros en la funcion nativa scanf',self.columna,self.linea))
             tt=estat.newTemp()
             return nodoC3d(tt,newtipo(tipoPrimitivo.void,''),tt+'=read();',[],[],'')
+        elif self.nombre.lower()=='sizeof':
+            if len(self.parametros)>1:
+                estat.Lerrores.append(CError('Semantico','solo se esperaba 1 parametro en la funcion sizeof',self.columna,self.linea))
+            tt=estat.newTemp()
+            return nodoC3d(tt,newtipo(tipoPrimitivo.void,''),tt+'=4;',[],[],'')
         elif self.nombre.lower()=='printf':
             cod=''
             if len(self.parametros)>1:

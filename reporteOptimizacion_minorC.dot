@@ -4,5 +4,22 @@ node0 [    shape=plaintext
 
       <table cellspacing='0'>
       <tr><td>TIPO</td><td>Antes</td><td>Despues</td><td>Linea</td></tr>
-<tr><td>Codigo Muerto</td><td>goto return; <br/> goto return;</td><td> goto return; </td><td>22</td></tr><tr><td>Codigo Muerto</td><td>goto return; <br/> goto return;</td><td> goto return; </td><td>40</td></tr><tr><td>Codigo Muerto</td><td>goto return; <br/> goto return;</td><td> goto return; </td><td>49</td></tr>    </table>
+
+<tr><td>Aritmetica Suma</td><td>
+
+$t3 = 5 + 0;
+</td><td>
+
+<br/>5</td><td>4</td></tr>
+<tr><td>Aritmetica Resta</td><td>
+
+$t5 = 5 - 0;
+</td><td>
+
+<br/>5</td><td>4</td></tr><tr><td>Aritmetica Suma</td><td>
+
+$t7 = 0 + 5;
+</td><td>
+
+<br/>5</td><td>4</td></tr><tr><td>Codigo Muerto</td><td>goto return; <br/> goto return;</td><td> goto return; </td><td>1</td></tr>    </table>
 >];}

@@ -97,7 +97,7 @@ def traducir(Linstr,c,Le,tabs):
     # print(c3dOptimizado)
 
     correrAugus(c3dOptimizado,c)
-
+    global c3dPAraDebug
     c3dPAraDebug=c3dOptimizado
 
     gReporteErrTraduccion(ast.Lerrores)
@@ -623,7 +623,7 @@ class Ventana:
 
     def debugg(self):
 
-
+        global c3dPAraDebug
         if c3dPAraDebug=='':
             tkinter.messagebox.showerror(
                 "Error", "No se encontro consola de entrada de texto")
