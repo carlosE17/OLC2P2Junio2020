@@ -1,0 +1,8 @@
+digraph {
+node0 [    shape=plaintext
+    label=<
+
+      <table cellspacing='0'>
+      <tr><td>ID</td><td>Tipo</td><td>Temporal</td><td>valor</td><td>Linea</td></tr>
+<tr> <td> main</td><td> funcion Entero </td><td> --- </td><td> --- </td><td> 1</td> </tr>    </table>
+>];}

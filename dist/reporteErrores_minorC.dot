@@ -1,0 +1,8 @@
+digraph {
+node0 [    shape=plaintext
+    label=<
+
+      <table cellspacing='0'>
+      <tr><td>TIPO</td><td>Descripcion</td><td>Linea</td></tr>
+<tr> <td> Sintactico</td><td> Se encontro ')' </td><td> 3 </td> </tr>    </table>
+>];}
