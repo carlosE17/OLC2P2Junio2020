@@ -1,2 +1,2 @@
 # [OLC2] Proyecto 2 Junio2020
-Carlos Rodrigo Estrada Najarro
+Organizacion de Lenguajes y Compiladores 2, junio 2020
